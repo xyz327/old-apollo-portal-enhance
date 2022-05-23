@@ -89,7 +89,13 @@
   
     function toggleDiff() {
       jQuery(".change-diff").toggle();
-      jQuery(".change-detail").toggle();
+      var needShow = jQuery(".change-diff").is(":hidden");
+      if(needShow){
+          jQuery(".change-detail").show();
+      } else {
+          jQuery(".change-detail").hide();
+      }
+      
     }
     function initChangeInfoDetail() {
       jQuery(".change-detail").hide();
