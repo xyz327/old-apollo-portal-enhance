@@ -3,14 +3,13 @@
 // @namespace    apollo-enhance
 // @version      0.1
 // @description  make old apollo better 
-// @homepage     http://git.kugou.net/xizhouxi/apollo-enhance
-// @downloadURL  http://git.kugou.net/xizhouxi/apollo-enhance/raw/master/tampermonkey-script.js
+// @homepage     https://github.com/xyz327/apollo-enhance
+// @downloadURL  https://raw.githubusercontent.com/xyz327/apollo-enhance/main/tampermonkey-script.js
 // @author       xizhouxi
-// @include      *://fxapollo.kugou.net/*
-// @include      *://apollo.fxsandbox.kugou.net/*
-// @include      *://apollo.kw.kugou.net/*
+// @include      *://*/config.html*
 // @require      https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/diff_match_patch/20121119/diff_match_patch_uncompressed.js
 // @noframes
+// @run-at  document-body
 
 // ==/UserScript==
 
@@ -37,7 +36,14 @@
       loadFeature("gotoNamespace", function () {
         enabledGotoNamespace();
       });
-  
+      loadFeature('removeNiceScroll', function(){
+        $(document).ready(function () {
+          // 放在初始化之后执行
+          setTimeout(function(){
+            $('html').getNiceScroll().remove();
+          },100)
+        })
+      })
       clearInterval(clear);
     }, 1000);
   
@@ -144,6 +150,17 @@
     }
   
     function getDiffHtml(oldVal, newVal) {
+      try{
+        oldVal = JSON.stringify(JSON.parse(oldVal))
+      }catch(e){
+
+      }
+      try{
+        newVal = JSON.stringify(JSON.parse(newVal))
+      }catch(e){
+
+      }
+      console.log(oldVal, newVal)
       var diff = DiffMatch.diff_main(oldVal, newVal);
   
       DiffMatch.diff_cleanupSemantic(diff);
