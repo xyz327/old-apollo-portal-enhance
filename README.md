@@ -2,7 +2,8 @@
 
 ![license](https://img.shields.io/github/license/xyz327/old-apollo-portal-enhance?style=flat-square)
 
-> 优化旧版 apollo 管理台的使用 (基于 1.1.2)
+> 对旧版本 apollo 控制台使用优化(基于 1.1.2)  .最好的方式还是修改服务端。  
+> 这里只是面向于对于不能升级 apollo 版本并且无法修改源码的 apollo 管理台的使用者
 
 ## 安装
 
