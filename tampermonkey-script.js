@@ -1,15 +1,16 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.1
+// @version      0.2
 // @description  make old apollo better 
 // @homepage     https://github.com/xyz327/apollo-enhance
 // @downloadURL  https://raw.githubusercontent.com/xyz327/apollo-enhance/main/tampermonkey-script.js
+// @updateURL  https://raw.githubusercontent.com/xyz327/apollo-enhance/main/tampermonkey-script.js
 // @author       xizhouxi
-// @include      *://*/config.html*
+// @match        *://*/config.html*
 // @require      https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/diff_match_patch/20121119/diff_match_patch_uncompressed.js
 // @noframes
-// @run-at  document-body
+// @run-at      document-body
 
 // ==/UserScript==
 
