@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.2
+// @version      0.3
 // @description  make old apollo better 
 // @homepage     https://github.com/xyz327/apollo-enhance
 // @downloadURL  https://raw.githubusercontent.com/xyz327/apollo-enhance/main/tampermonkey-script.js
@@ -17,9 +17,9 @@
 (function () {
     "use strict";
     console.log("===start");
-    //var jq = jQuery.noConflict();
+    //var jq = $.noConflict();
     var DiffMatch = new diff_match_patch();
-    var $, jQuery;
+    var $;
     var clear = setInterval(function () {
       if (!window.unsafeWindow || window.unsafeWindow.appUtil === undefined) {
         console.log("========= page load unfinshed");
@@ -29,7 +29,7 @@
       if (releaseModalNode == null) {
         return;
       }
-      $ = jQuery = unsafeWindow.$;
+      $ = unsafeWindow.$;
       console.log("========= page load finshed");
       loadFeature("diff", function () {
         bindDiffInfo(releaseModalNode);
@@ -57,7 +57,7 @@
     }
     function enabledGotoNamespace() {
       var clear = setInterval(function () {
-        var $namespaces = jQuery(".namespace-name");
+        var $namespaces = $(".namespace-name");
         if ($namespaces.length == 0) {
           return;
         }
@@ -72,12 +72,12 @@
         initChangeInfoHeader();
         // 每次都需要隐藏
         initChangeInfoDetail();
-        var $cols = jQuery("#releaseModal table tr.ng-scope");
+        var $cols = $("#releaseModal table tr.ng-scope");
   
         var kvInfo = {};
         for (const col of $cols) {
-          var $col = jQuery(col);
-          var tds = jQuery(col).find("td");
+          var $col = $(col);
+          var tds = $(col).find("td");
           kvInfo = {
             key: tds[0].title,
             oldVal: tds[1].title,
@@ -95,20 +95,20 @@
     }
   
     function toggleDiff() {
-      jQuery(".change-diff").toggle();
-      var needShow = jQuery(".change-diff").is(":hidden");
+      $(".change-diff").toggle();
+      var needShow = $(".change-diff").is(":hidden");
       if(needShow){
-          jQuery(".change-detail").show();
+          $(".change-detail").show();
       } else {
-          jQuery(".change-detail").hide();
+          $(".change-detail").hide();
       }
       
     }
     function initChangeInfoDetail() {
-      jQuery(".change-detail").hide();
-      var $cols = jQuery("#releaseModal table tr.ng-scope");
+      $(".change-detail").hide();
+      var $cols = $("#releaseModal table tr.ng-scope");
       for (var col of $cols) {
-        var $col = jQuery(col);
+        var $col = $(col);
         if ($col.hasClass("diff-info-inited")) {
           return;
         }
@@ -117,9 +117,9 @@
       }
     }
     function initChageCol() {
-      var bodyRows = jQuery("#releaseModal table tr.ng-scope");
+      var bodyRows = $("#releaseModal table tr.ng-scope");
       for (var row of bodyRows) {
-        var $row = jQuery(row);
+        var $row = $(row);
         if ($row.find("td.change-diff").length == 0) {
           $row.find("td:gt(0)").addClass("change-detail x-detail").hide();
           $row.append('<td class="change-diff diff-text"></td>');
@@ -127,23 +127,23 @@
       }
     }
     function initChangeInfoHeader() {
-      if (jQuery("#releaseModal table thead tr>th").length == 0) {
+      if ($("#releaseModal table thead tr>th").length == 0) {
         return;
       }
-      if (jQuery("#toggleDiff").length != 0) {
+      if ($("#toggleDiff").length != 0) {
         return;
       }
       // 隐藏原有信息
-      jQuery("#releaseModal table thead tr>th:gt(0)")
+      $("#releaseModal table thead tr>th:gt(0)")
         .addClass("change-detail")
         .hide();
       // 增加差异信息展示
-      var headCol = jQuery("#releaseModal table thead tr");
+      var headCol = $("#releaseModal table thead tr");
       headCol.append('<th class="change-diff">差异</th>');
-      jQuery("#releaseModal table thead tr>th:eq(0)").append(
+      $("#releaseModal table thead tr>th:eq(0)").append(
         '<button id="toggleDiff">切换显示</button>'
       );
-      jQuery("#toggleDiff").click(function () {
+      $("#toggleDiff").click(function () {
         toggleDiff();
         return false;
       });
@@ -172,7 +172,7 @@
     //=============
   
     function goToNamespace($namespaces) {
-      if (jQuery("#namespace-jump").length > 0) {
+      if ($("#namespace-jump").length > 0) {
         return;
       }
       $("body>nav.navbar")
@@ -191,7 +191,7 @@
 
       var list = "";
       for (const namespace of $namespaces) {
-        var $namespace = jQuery(namespace);
+        var $namespace = $(namespace);
         var namespaceVal = $namespace.text();
         var namespaceId = $namespace.text().replaceAll(".", "-");
         $namespace.append(`<span id="${namespaceId}"></span>`);
@@ -199,7 +199,7 @@
           namespaceVal == "application" ? 100 : 10
         }" name="${namespaceId}">${namespaceVal}</a></li>`;
       }
-      var $navBar = jQuery("#bs-example-navbar-collapse-1");
+      var $navBar = $("#bs-example-navbar-collapse-1");
       $navBar.append(`
         <ul class="nav navbar-nav navbar-right">
         <li class="dropdown" >
@@ -214,13 +214,13 @@
         </ul>
         `);
       console.log("goto namespace init finished");
-      // jQuery("#namespace-jump").dropdown();
-      jQuery(".goToNamespace").click(function (event) {
+      // $("#namespace-jump").dropdown();
+      $(".goToNamespace").click(function (event) {
         var target = event.target;
         $("html,body").animate(
           {
             scrollTop:
-              jQuery("#" + target.name).offset().top - $(target).attr("offset"),
+              $("#" + target.name).offset().top - $(target).attr("offset"),
           },
           1000
         );
