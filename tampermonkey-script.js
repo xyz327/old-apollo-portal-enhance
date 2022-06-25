@@ -4,6 +4,8 @@
 // @version      0.4
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
+// @website      https://github.com/xyz327/old-apollo-portal-enhance
+// @source       https://github.com/xyz327/old-apollo-portal-enhance
 // @downloadURL  https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/tampermonkey-script.js
 // @updateURL    https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/tampermonkey-script.js
 // @author       xizhouxi
