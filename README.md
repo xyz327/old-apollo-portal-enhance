@@ -13,14 +13,21 @@
 
 ## 优化点
 
-### 增加发布差异对比
+### 恢复浏览器 Ctrl+F 搜索跳转
 
-![change-diff](doc/change-diff.png)
+> 由于在使用 nice-scroll 后会在 html 标签上增加 style="overflow:hidden" 从而导致`ctrl+F` 搜索内容后无法正确调整到指定位置
+
+Apollo 1.2.0 移除了 nice-scroll [PR](https://github.com/apolloconfig/apollo/pull/1621)
 
 ### 增加跳转到指定 namespce
 
 ![gotoNamespace](doc/gotoNamespace.png)
 
-### 取消整体页面的nice-scroll
+### 增加发布差异对比
 
-> 由于在使用 nice-scroll 后会导致`ctrl+F` 搜索内容后无法正确调整到指定位置
+![change-diff-1](doc/change-diff-1.png)
+![change-diff-2](doc/change-diff-2.png)
+
+
+
+
