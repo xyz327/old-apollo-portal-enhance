@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.6
+// @version      0.7
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -29,7 +29,7 @@
   var DiffMatch = new diff_match_patch();
 
   $ = unsafeWindow.$;
-
+  var namespaceLoaded = false;
   function getAppId() {
     let hash = location.hash;
     if (hash) {
@@ -54,6 +54,7 @@
         $("html").css("overflow", "");
       }, 200);
     });
+    return true;
   });
 
   loadFeature("gotoNamespace", true, function () {
@@ -62,10 +63,11 @@
       return false;
     }
     goToNamespace($namespaces);
+    namespaceLoaded = true;
     return true;
   });
 
-  loadFeature("fixEnvTab", false, function () {
+  loadFeature("fixEnvTab", true, function (isReloadByHash) {
     var $tab = $(".J_appFound");
     if ($tab.length == 0) {
       return false;
@@ -86,48 +88,50 @@
     $curEnvInfo.html(`
     <span class="label label-success">${env}</span> - <span class="label label-info">${cluster}</span>
     `);
+    if (!isReloadByHash) {
+      // 不是通过 hash change reload 的才需要绑定事件
+      $tab.find(".panel-heading .slideBtn").on("click", function (e) {
+        const $header = $(e.target).parent(".panel-heading");
+        $header.next("div").slideToggle("normal", function () {});
+      });
 
-    $tab.find(".panel-heading .slideBtn").on("click", function (e) {
-      const $header = $(e.target).parent(".panel-heading");
-      $header.next("div").slideToggle("normal", function () {});
-    });
-
-    $tab = $tab.parent();
-    $tab.on("affixed.bs.affix", function (e) {
-      $tab.css({ position: "fixed" });
-      $tab
-        .find(".panel-heading")
-        .next("div")
-        .slideUp("normal", function () {});
-    });
-    $tab.on("affixed-top.bs.affix	", function (e) {
-      $tab.css({ position: "" });
-      $tab
-        .find(".panel-heading")
-        .next("div")
-        .slideDown("normal", function () {});
-    });
-    $tab.affix({
-      offset: {
-        top: 50,
-      },
-    });
+      $tab = $tab.parent();
+      $tab.on("affixed.bs.affix", function (e) {
+        $tab.css({ position: "fixed" });
+        $tab
+          .find(".panel-heading")
+          .next("div")
+          .slideUp("normal", function () {});
+      });
+      $tab.on("affixed-top.bs.affix	", function (e) {
+        $tab.css({ position: "" });
+        $tab
+          .find(".panel-heading")
+          .next("div")
+          .slideDown("normal", function () {});
+      });
+      $tab.affix({
+        offset: {
+          top: 50,
+        },
+      });
+    }
     return true;
   });
 
   function loadFeature(name, reloadOnHashChange, feature) {
-    loadFeature0(name, feature);
+    loadFeature0(name, feature, false);
     if (reloadOnHashChange) {
       $(window).on("hashchange", function (e) {
-        loadFeature0(name, feature);
+        loadFeature0(name, feature, true);
       });
     }
   }
 
-  function loadFeature0(name, feature) {
+  function loadFeature0(name, feature, isReloadByHash) {
     try {
       var clear = setInterval(function () {
-        if (feature()) {
+        if (feature(isReloadByHash)) {
           console.log(`loadFeature: ${name} finished`);
           clearInterval(clear);
         }
