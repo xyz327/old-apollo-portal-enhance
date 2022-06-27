@@ -14,9 +14,11 @@
     - [增加跳转到指定 namespce](#增加跳转到指定-namespce)
     - [增加发布差异对比](#增加发布差异对比)
   
-## 安装
+## 安装 tampermonkey 浏览器插件
 
 1. 浏览器安装 [tampermonkey](https://www.tampermonkey.net/) 插件 (若无法科学上网可以使用[离线下载](https://www.crx4.com/27046.html))
+
+## 安装 tampermonkey 脚本
 
 ### 从 greasyfork 安装
 
