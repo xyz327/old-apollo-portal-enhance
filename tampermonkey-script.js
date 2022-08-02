@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.7
+// @version      0.8
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -160,49 +160,49 @@
 
     $("#goToNamespace").remove();
     var list = "";
+    var namespaceOffsets = []
+    var lastNamespaceId = 'application'
     for (const namespace of $namespaces) {
       var $namespace = $(namespace);
       var namespaceVal = $namespace.text();
-      var namespaceId = $namespace.text();
-      list += `<li><a href="javascript:void(0)" class="goToNamespace" offset="${
-        namespaceVal == "application" ? 100 : 100
-      }" name="${namespaceId}">${namespaceVal}</a></li>`;
+      var namespaceId = $namespace.text().replaceAll(".", "-");
+      namespaceOffsets.push({top:$namespace.offset().top, id:lastNamespaceId})
+      lastNamespaceId = namespaceId
+      $namespace.after(`<a href="#${namespaceId}" id="${namespaceId}"></a>`)
+      list += `<option value="${namespaceId}">${namespaceVal}</option>`;
     }
 
     var $navBar = $("#bs-example-navbar-collapse-1");
     $navBar.append(`
-        <ul id="goToNamespace" class="nav navbar-nav navbar-right">
-        <li class="dropdown" >
-        <a id="dLabel" type="button" id="namespace-jump" data-toggle="dropdown" aria-haspopup="true" role="button"  aria-expanded="false">
-          跳转到 Namespace
-          <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="dLabel">
-          ${list}
-        </ul>
-        </li>
-        </ul>
+        <div id="goToNamespace" class="nav navbar-nav navbar-right" style="margin-top: 10px;">
+        <select id="namespaceSelecter">${list}</select>
+        </div>
         `);
 
-    // $("#namespace-jump").dropdown();
-    $(".goToNamespace").click(function (event) {
-      var target = event.target;
-      // 可能有多个
-      var $namespaceNode = $(`.namespace-name:contains("${target.name}")`);
-      if ($namespaceNode.length > 1) {
-        for (var i = 0; i < $namespaceNode.length; i++) {
-          if ($($namespaceNode[i]).html() == target.name) {
-            $namespaceNode = $($namespaceNode[i]);
-            break;
-          }
-        }
+    var $select = $("#namespaceSelecter");
+    $select.select2({
+      placeholder: "跳转到 Namespace",
+    });
+    $select.on('select2:open', function (e) {
+      $("#select2-namespaceSelecter-results").css({"max-height":'400px'})
+    });
+    var selectedVal
+    $("html").getNiceScroll(0).scrollend(function(e){
+      var offsetY = e.end.y;
+      var curNamespace = namespaceOffsets.find(val=>val.top>offsetY)
+      if(curNamespace && selectedVal != curNamespace.id){
+        //TODO 
+        selectedVal = curNamespace.id
+        $select.val(selectedVal).trigger('change');
       }
-      $("html,body").animate(
-        {
-          scrollTop: $namespaceNode.offset().top - $(target).attr("offset"),
-        },
-        1000
-      );
+    })
+    $select.on("select2:select", function (e) {
+      var namespaceId = $select.val();
+      console.log(namespaceId)
+      var $namespaceNode = $(`#${namespaceId}`);
+      
+      $("html").getNiceScroll(0).doScrollTop($namespaceNode.offset().top-100, 1000);
+
     });
   }
 
