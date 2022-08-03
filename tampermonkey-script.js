@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.8
+// @version      0.8.1
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -160,15 +160,18 @@
 
     $("#goToNamespace").remove();
     var list = "";
-    var namespaceOffsets = []
-    var lastNamespaceId = 'application'
+    var namespaceOffsets = [];
+    var lastNamespaceId = "application";
     for (const namespace of $namespaces) {
       var $namespace = $(namespace);
       var namespaceVal = $namespace.text();
       var namespaceId = $namespace.text().replaceAll(".", "-");
-      namespaceOffsets.push({top:$namespace.offset().top, id:lastNamespaceId})
-      lastNamespaceId = namespaceId
-      $namespace.after(`<a href="#${namespaceId}" id="${namespaceId}"></a>`)
+      namespaceOffsets.push({
+        top: $namespace.offset().top,
+        id: lastNamespaceId,
+      });
+      lastNamespaceId = namespaceId;
+      $namespace.after(`<a href="#${namespaceId}" id="${namespaceId}"></a>`);
       list += `<option value="${namespaceId}">${namespaceVal}</option>`;
     }
 
@@ -183,26 +186,30 @@
     $select.select2({
       placeholder: "跳转到 Namespace",
     });
-    $select.on('select2:open', function (e) {
-      $("#select2-namespaceSelecter-results").css({"max-height":'400px'})
+    $select.on("select2:open", function (e) {
+      $("#select2-namespaceSelecter-results").css({ "max-height": "400px" });
     });
-    var selectedVal
-    $("html").getNiceScroll(0).scrollend(function(e){
-      var offsetY = e.end.y;
-      var curNamespace = namespaceOffsets.find(val=>val.top>offsetY)
-      if(curNamespace && selectedVal != curNamespace.id){
-        //TODO 
-        selectedVal = curNamespace.id
-        $select.val(selectedVal).trigger('change');
+    var selectedVal;
+    var triggerBySelect = false;
+    var htmlScroll = $("html").getNiceScroll(0);
+    htmlScroll.scrollend(function (e) {
+      if (triggerBySelect) {
+        triggerBySelect = false;
+        return;
       }
-    })
+      var offsetY = e.end.y;
+      var curNamespace = namespaceOffsets.find((val) => val.top > offsetY);
+      if (curNamespace && selectedVal != curNamespace.id) {
+        //TODO
+        selectedVal = curNamespace.id;
+        $select.val(selectedVal).trigger("change");
+      }
+    });
     $select.on("select2:select", function (e) {
       var namespaceId = $select.val();
-      console.log(namespaceId)
       var $namespaceNode = $(`#${namespaceId}`);
-      
-      $("html").getNiceScroll(0).doScrollTop($namespaceNode.offset().top-100, 1000);
-
+      triggerBySelect = true;
+      htmlScroll.doScrollTop($namespaceNode.offset().top - 100, 1000);
     });
   }
 
