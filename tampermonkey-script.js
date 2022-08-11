@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.8.2
+// @version      0.8.3
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -321,8 +321,11 @@
     var errorJson = isErrorJson(newVal)
     if (errorJson) {
       var $td = $node.parent().find('td:first')
-      $td.append('<span class="label label-danger">错误的json</span>')
-      $td.addClass('alert alert-danger')
+      var errorJsonLabelId = `${key}-errorJson`;
+      if($(`#${errorJsonLabelId}`).length == 0){
+        $td.append(`<span id="${errorJsonLabelId}" class="label label-danger">错误的json</span>`)
+        $td.addClass('alert alert-danger')
+      }
     } 
     $node.on("click", function () {
       const tdfh = new TextDifferentForHtml(
