@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.8.1
+// @version      0.8.2
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -165,13 +165,13 @@
     for (const namespace of $namespaces) {
       var $namespace = $(namespace);
       var namespaceVal = $namespace.text();
-      var namespaceId = $namespace.text().replaceAll(".", "-");
+      var namespaceId = namespaceVal;//$namespace.text().replaceAll(".", "-");
       namespaceOffsets.push({
         top: $namespace.offset().top,
         id: lastNamespaceId,
       });
       lastNamespaceId = namespaceId;
-      $namespace.after(`<a href="#${namespaceId}" id="${namespaceId}"></a>`);
+      //$namespace.parents('header.panel-heading').after(`<a href="#${namespaceId}" id="${namespaceId}"></a>`);
       list += `<option value="${namespaceId}">${namespaceVal}</option>`;
     }
 
@@ -207,9 +207,10 @@
     });
     $select.on("select2:select", function (e) {
       var namespaceId = $select.val();
-      var $namespaceNode = $(`#${namespaceId}`);
+     
+      var namespaceEl = $namespaces.toArray().find(el=>el.innerHTML==namespaceId)
       triggerBySelect = true;
-      htmlScroll.doScrollTop($namespaceNode.offset().top - 100, 1000);
+      htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
     });
   }
 
@@ -317,7 +318,12 @@
 
     var html = DiffMatch.diff_prettyHtml(diff);
     $node.html(html);
-
+    var errorJson = isErrorJson(newVal)
+    if (errorJson) {
+      var $td = $node.parent().find('td:first')
+      $td.append('<span class="label label-danger">错误的json</span>')
+      $td.addClass('alert alert-danger')
+    } 
     $node.on("click", function () {
       const tdfh = new TextDifferentForHtml(
         $("#diff-container")[0], // The dom used to render the display code
@@ -333,6 +339,18 @@
     });
   }
 
+  function isErrorJson(val){
+    val = val.trim()
+    if(val.startsWith('{') || val.startsWith('[')){
+      try {
+        JSON.parse(val);
+        return false
+      } catch (e) {
+        return true
+      }
+    }
+    return false
+  }
   function toPerttyJson(val) {
     try {
       return JSON.stringify(JSON.parse(val), null, 2);
