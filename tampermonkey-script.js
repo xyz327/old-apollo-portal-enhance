@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.8.3
+// @version      0.8.4
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -38,7 +38,33 @@
       return url.searchParams.get("appid");
     }
   }
-
+  var enhanceNavId = "apollo-enhance-nav";
+  function appendNavBar(child) {
+    $(`#${enhanceNavId}`).append(child);
+  }
+  loadFeature("disableScrollOnModal", false, function () {
+    $("body")
+      .on("show.bs.modal", function () {
+        $("html").css("overflow", "hidden");
+      })
+      .on("hide.bs.modal", function () {
+        $("html").css("overflow", "");
+      });
+    return true;
+  });
+  loadFeature("nav", false, function () {
+    var $navBar = $("#bs-example-navbar-collapse-1");
+    $navBar.append(`
+        <ul id="${enhanceNavId}" class="nav navbar-nav navbar-right">
+          
+        </ul>
+        `);
+    return true;
+  });
+  loadFeature("featureInfo", false, function () {
+    //TODO featureInfo();
+    return true;
+  });
   loadFeature("diff", false, function () {
     var releaseModalNode = document.querySelector("#releaseModal");
     if (releaseModalNode == null) {
@@ -165,7 +191,7 @@
     for (const namespace of $namespaces) {
       var $namespace = $(namespace);
       var namespaceVal = $namespace.text();
-      var namespaceId = namespaceVal;//$namespace.text().replaceAll(".", "-");
+      var namespaceId = namespaceVal; //$namespace.text().replaceAll(".", "-");
       namespaceOffsets.push({
         top: $namespace.offset().top,
         id: lastNamespaceId,
@@ -175,11 +201,10 @@
       list += `<option value="${namespaceId}">${namespaceVal}</option>`;
     }
 
-    var $navBar = $("#bs-example-navbar-collapse-1");
-    $navBar.append(`
-        <div id="goToNamespace" class="nav navbar-nav navbar-right" style="margin-top: 10px;">
+    appendNavBar(`
+        <li id="goToNamespace" style="margin-top: 10px;">
         <select id="namespaceSelecter">${list}</select>
-        </div>
+        </li>
         `);
 
     var $select = $("#namespaceSelecter");
@@ -187,7 +212,7 @@
       placeholder: "跳转到 Namespace",
     });
     $select.on("select2:open", function (e) {
-      $("#select2-namespaceSelecter-results").css({ "max-height": "400px" });
+      $("#select2-namespaceSelecter-results").css({ "max-height": "600px" });
     });
     var selectedVal;
     var triggerBySelect = false;
@@ -207,8 +232,10 @@
     });
     $select.on("select2:select", function (e) {
       var namespaceId = $select.val();
-     
-      var namespaceEl = $namespaces.toArray().find(el=>el.innerHTML==namespaceId)
+
+      var namespaceEl = $(".namespace-name")
+        .toArray()
+        .find((el) => el.innerHTML == namespaceId);
       triggerBySelect = true;
       htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
     });
@@ -318,15 +345,17 @@
 
     var html = DiffMatch.diff_prettyHtml(diff);
     $node.html(html);
-    var errorJson = isErrorJson(newVal)
+    var errorJson = isErrorJson(newVal);
     if (errorJson) {
-      var $td = $node.parent().find('td:first')
+      var $td = $node.parent().find("td:first");
       var errorJsonLabelId = `${key}-errorJson`;
-      if($(`#${errorJsonLabelId}`).length == 0){
-        $td.append(`<span id="${errorJsonLabelId}" class="label label-danger">错误的json</span>`)
-        $td.addClass('alert alert-danger')
+      if ($(`#${errorJsonLabelId}`).length == 0) {
+        $td.append(
+          `<span id="${errorJsonLabelId}" class="label label-danger">错误的json</span>`
+        );
+        $td.addClass("alert alert-danger");
       }
-    } 
+    }
     $node.on("click", function () {
       const tdfh = new TextDifferentForHtml(
         $("#diff-container")[0], // The dom used to render the display code
@@ -342,17 +371,17 @@
     });
   }
 
-  function isErrorJson(val){
-    val = val.trim()
-    if(val.startsWith('{') || val.startsWith('[')){
+  function isErrorJson(val) {
+    val = val.trim();
+    if (val.startsWith("{") || val.startsWith("[")) {
       try {
         JSON.parse(val);
-        return false
+        return false;
       } catch (e) {
-        return true
+        return true;
       }
     }
-    return false
+    return false;
   }
   function toPerttyJson(val) {
     try {
@@ -377,6 +406,64 @@
                 <div class="col-xs-6 text-center"><span class="label label-success">新值</span></div>
               </div>
               <div id="diff-container" style="display:flex"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    `);
+  }
+
+  function featureInfo() {
+    initFeatureInfoModal();
+    appendNavBar(`
+    <li>
+    <a href="javascript:void(0);" id="showFeatureInfo">
+    <span class="glyphicon glyphicon-question-sign"></span>
+    </a>
+    </li>
+    `);
+    $("#showFeatureInfo").on("click", showFeatureInfo);
+  }
+
+  function showFeatureInfo() {
+    var data = [
+      {
+        title: "json格式校验",
+        img: "https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/doc/change-diff-1.png",
+      },
+      {
+        title: "namespace跳转",
+        img: "https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/doc/gotoNamespace.png",
+      },
+    ];
+    var content = "";
+    for (const val of data) {
+      content += `
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">${val.title}</h3>
+        </div>
+        <div class="panel-body">
+          <img class="img-responsive" src="${val.img}"/>
+        </div>
+      </div>
+      `;
+    }
+    $("#featureModalBody").html(content);
+    $("#featureModal").modal();
+  }
+  function initFeatureInfoModal() {
+    $("body").append(`
+    <!-- Modal -->
+    <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">apollo-enhance 功能说明</h4>
+          </div>
+          <div class="modal-body" id="featureModalBody">
+             
           </div>
         </div>
       </div>
