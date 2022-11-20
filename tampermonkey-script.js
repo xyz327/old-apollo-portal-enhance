@@ -197,8 +197,9 @@
         id: lastNamespaceId,
       });
       lastNamespaceId = namespaceId;
+      var noChange = $(namespace).parent().parent().find(".modify-tip.ng-hide").length > 0
       //$namespace.parents('header.panel-heading').after(`<a href="#${namespaceId}" id="${namespaceId}"></a>`);
-      list += `<option value="${namespaceId}">${namespaceVal}</option>`;
+      list += `<option value="${namespaceId}" data-change="${!noChange}">${namespaceVal}</option>`;
     }
 
     appendNavBar(`
@@ -210,6 +211,15 @@
     var $select = $("#namespaceSelecter");
     $select.select2({
       placeholder: "跳转到 Namespace",
+      templateResult: function(state){
+        console.log(state)
+        var changed = $(state.element).attr("data-change")
+        console.log(changed)
+        if(changed){
+          return  $(`<label>${state.text}<span class="label label-warning ">改</span></label>`)
+        }
+        return `<label>${state.text}</label>`
+      }
     });
     $select.on("select2:open", function (e) {
       $("#select2-namespaceSelecter-results").css({ "max-height": "600px" });
