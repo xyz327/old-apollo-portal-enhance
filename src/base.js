@@ -25,9 +25,9 @@ loadFeature("nav", false, function () {
     });
   });
   // 加载 layer  依赖 $
-  GM_addElement('script', {
-    src: 'https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js',
-    type: 'text/javascript'
+  GM_addElement("script", {
+    src: "https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
+    type: "text/javascript",
   });
 })();
 export function onNamesacpeLoaded(cb) {
@@ -38,8 +38,16 @@ loadFeature("onNamesacpeLoaded", true, function () {
   if ($namespaces.length == 0) {
     return false;
   }
-  console.log('trigger namespaceLoaded')
+  console.log("trigger namespaceLoaded");
   $("body").trigger("namespaceLoaded");
+  const observer = new MutationObserver(function () {
+    console.log("rebuild" );
+    $("body").trigger("namespaceLoaded");
+  });
+
+  $.each($(".config-item-container"), (index, el) => {
+    observer.observe(el, { childList: true });
+  });
 });
 export function getAppId() {
   let hash = location.hash;
@@ -54,6 +62,7 @@ export function loadFeature(name, reloadOnHashChange, feature) {
   loadFeature0(name, feature, false);
   if (reloadOnHashChange) {
     $(window).on("hashchange", function (e) {
+      console.log("hashchange");
       loadFeature0(name, feature, true);
     });
   }
