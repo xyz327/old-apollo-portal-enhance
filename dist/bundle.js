@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         apollo-enhance
+// @name         apollo-enhance-v2
 // @namespace    apollo-enhance
 // @version      0.8.5
 // @description  make old apollo better

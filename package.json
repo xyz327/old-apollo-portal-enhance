@@ -1,8 +1,8 @@
 {
-  "name": "apollo-enhance",
+  "name": "apollo-enhance-v2",
   "version": "0.8.5",
   "description": "make old apollo better",
-  "main": "index.js",
+  "main": "src/main.js",
   "directories": {
     "doc": "doc"
   },
