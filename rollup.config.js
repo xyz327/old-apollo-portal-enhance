@@ -1,5 +1,7 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import { string } from "rollup-plugin-string";
+import json from '@rollup/plugin-json';
 
 import * as fs from "fs";
 import pkg from "./package.json";
@@ -14,12 +16,18 @@ export default {
     globals: {
       // 全局
       jquery: "$",
+      lodash: '_'
     },
   },
-  external: ["jquery"], // 外部依赖 不会写入打包文件
+  external: ["jquery", "lodash"], // 外部依赖 不会写入打包文件
   plugins: [
     commonjs(), // so Rollup can convert `ms` to an ES module
     resolve(), // so Rollup can find `ms`
+    string({
+      // Required to be specified
+      include: "**/*.html",
+    }),
+    json(),
     // typescript(),
   ],
 };

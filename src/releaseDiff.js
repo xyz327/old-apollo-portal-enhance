@@ -12,7 +12,6 @@ loadFeature("releaseDiff", false, function () {
 });
 
 function bindDiffInfo(node) {
-  initDiifLib();
   var observer = new MutationObserver(function () {
     initChangeInfoHeader();
     // 每次都需要隐藏
@@ -97,12 +96,6 @@ function initChangeInfoHeader() {
   });
 }
 
-function initDiifLib() {
-  const highlight_xcode_css = GM_getResourceText("highlight_xcode_css");
-  const text_different_css = GM_getResourceText("text_different_css");
-  GM_addStyle(highlight_xcode_css);
-  GM_addStyle(text_different_css);
-}
 function buildDiffHtml($node, key, oldVal, newVal) {
   // 新增或删除
 
