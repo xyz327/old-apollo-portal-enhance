@@ -29,9 +29,29 @@ loadFeature("nav", false, function () {
     src: "https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
     type: "text/javascript",
   });
+  GM_addElement("link", {
+    href: "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
+    rel: "stylesheet",
+  });
+  GM_addElement("script", {
+    src: "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js",
+    type: "text/javascript",
+  });
+  const highlight_xcode_css = GM_getResourceText("highlight_xcode_css");
+  const text_different_css = GM_getResourceText("text_different_css");
+  GM_addStyle(highlight_xcode_css);
+  GM_addStyle(text_different_css);
 })();
+var onNamesacpeLoadedCbs = [];
 export function onNamesacpeLoaded(cb) {
-  $("body").on("namespaceLoaded", cb);
+  if (typeof cb === "function") {
+    onNamesacpeLoadedCbs.push(cb);
+  }
+  return {
+    then: function (cb) {
+      onNamesacpeLoadedCbs.push(cb);
+    },
+  };
 }
 loadFeature("onNamesacpeLoaded", true, function () {
   var $namespaces = $(".namespace-name");
@@ -39,9 +59,12 @@ loadFeature("onNamesacpeLoaded", true, function () {
     return false;
   }
   console.log("trigger namespaceLoaded");
+  $("body").on("namespaceLoaded", () => {
+    onNamesacpeLoadedCbs.forEach((cb) => cb());
+  });
   $("body").trigger("namespaceLoaded");
   const observer = new MutationObserver(function () {
-    console.log("rebuild" );
+    console.log("rebuild", arguments);
     $("body").trigger("namespaceLoaded");
   });
 
@@ -58,13 +81,39 @@ export function getAppId() {
   }
 }
 
-export function loadFeature(name, reloadOnHashChange, feature) {
+export function loadFeature(name, options, feature) {
+  options =
+    typeof options === "object"
+      ? options
+      : {
+          switch: true,
+          reloadOnHashChange: options,
+        };
+  if (options.switch) {
+    //  allFeature.push(name);
+    if (isFeatureDisabled(name)) {
+      console.log(`loadFeature: ${name} has disabled`);
+      return;
+    }
+  }
+  var reloadOnHashChange = !!options.reloadOnHashChange;
   loadFeature0(name, feature, false);
   if (reloadOnHashChange) {
     $(window).on("hashchange", function (e) {
       console.log("hashchange");
       loadFeature0(name, feature, true);
     });
+  }
+}
+
+export function isFeatureDisabled(name) {
+  return !!localStorage.getItem("featureDisbaled:" + name);
+}
+export function switchFeature(name, enabled) {
+  if (enabled) {
+    localStorage.removeItem("featureDisbaled:" + name);
+  } else {
+    localStorage.setItem("featureDisbaled:" + name, true);
   }
 }
 export function showDiffModal(key, newVal, oldVal) {

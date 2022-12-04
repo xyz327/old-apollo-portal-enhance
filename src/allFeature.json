@@ -1,0 +1,38 @@
+[
+    {
+        "name":"disableScrollOnModal",
+        "desc": ""
+    },
+    {
+        "name":"fixEnvTab",
+        "desc": ""
+    },
+    {
+        "name":"fixNiceScroll",
+        "desc": ""
+    },
+    {
+        "name":"gotoNamespace",
+        "desc": ""
+    },
+    {
+        "name":"releaseDiff",
+        "desc": ""
+    },
+    {
+        "name":"releaseModal",
+        "desc": ""
+    },
+    {
+        "name":"showText",
+        "desc": ""
+    },
+    {
+        "name":"stash",
+        "desc": ""
+    },
+    {
+        "name":"prodWarn",
+        "desc": ""
+    }
+]

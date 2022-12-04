@@ -1,12 +1,23 @@
 import { loadFeature } from "./base";
 
 loadFeature("disableScrollOnModal", false, function () {
-    $("body")
-      .on("show.bs.modal", function () {
-        $("html").css("overflow", "hidden");
-      })
-      .on("hide.bs.modal", function () {
+  var openModalCnt = 0;
+  var htmlScroller = $("html").getNiceScroll(0);
+  $("body")
+    .on("shown.bs.modal", function () {
+      openModalCnt++;
+      $("html").css("overflow", "hidden");
+      htmlScroller.hide();
+    })
+    .on("hidden.bs.modal", function () {
+      openModalCnt--;
+      if (openModalCnt <= 0) {
         $("html").css("overflow", "");
-      });
-    return true;
+        htmlScroller.show();
+      }
+    });
+  $("body").on("scroll", ".modal.in", function () {
+    return false;
   });
+  return true;
+});
