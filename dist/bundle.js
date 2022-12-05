@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      0.9.0
+// @version      0.9.1
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -602,7 +602,12 @@
       });
       // 点击查看时 选择当前的 item
       $('body').on('click', "td.cursor-pointer", function(e){
-        var $tr = $(e.currentTarget).parent();
+        var $target = $(e.currentTarget);
+        if($target.prev('td.cursor-pointer').length == 0){
+          // 说明点击的是 key  忽略
+          return;
+        }
+        var $tr = $target.parent();
         var key = $tr.find("td:eq(1)").find('span:eq(0)').text().trim();
           var namespace = $tr
             .parents("section.master-panel-body.ng-scope")
