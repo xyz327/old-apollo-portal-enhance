@@ -3,25 +3,58 @@ import {
   appendNavBar,
   isFeatureDisabled,
   switchFeature,
+  getAllFeaturenMap,
+  featureState,
+  featureTypeState,
 } from "./base";
 import allFeature from "./allFeature.json";
 
 loadFeature("settings", { switch: false }, function () {
-  buildSettings()
+  buildSettings();
 });
 function buildSettings() {
-
-
   initSettingsModal();
   $('[data-toggle="switch"]')
-  .bootstrapSwitch({
-    onText: '开启',
-    offText: '关闭'
-  })
-  .on('switchChange.bootstrapSwitch', function(event, state) {
-    var feature = $(this).val()
-    switchFeature(feature, state)
-  });
+    .bootstrapSwitch({
+      onText: "开启",
+      offText: "关闭",
+      onSwitchChange: function (event, state) {
+        console.log(arguments);
+        if (!state) {
+          return;
+        }
+        var $el = $(this);
+        var featureName = $el.val();
+        var feature = getAllFeaturenMap()[featureName];
+        if (
+          feature &&
+          !featureTypeState(featureName, "enabledWarn") &&
+          feature.enabledWarn
+        ) {
+          layer.confirm(
+            feature.enabledWarn,
+            {
+              btn: ["确定", "取消"],
+            },
+            function (index) {
+              featureTypeState(featureName, "enabledWarn", true);
+              $el.bootstrapSwitch("state", true);
+              layer.close(index);
+            },
+            function () {}
+          );
+          return false;
+        }
+      },
+    })
+    .on("switchChange.bootstrapSwitch", function (event, state) {
+      var featureName = $(this).val();
+      switchFeature(featureName, state);
+      console.log(state)
+      if(!state){
+        featureTypeState(featureName, "enabledWarn", false);
+      }
+    });
 
   appendNavBar(`
   <li>
@@ -44,8 +77,10 @@ function initSettingsModal() {
     var checked = isFeatureDisabled(feature.name) ? "" : "checked";
     tpl += `
         <div class="form-group">
-            <label class="col-sm-2 control-label" for="feature-switch-${key}">${feature.name}</label>
-            <div class="col-sm-10">
+            <label class="col-sm-3 control-label" for="feature-switch-${key}">${feature.name}
+            <span class="glyphicon glyphicon-question-sign" data-tooltip="tooltip" title="${feature.desc}"></span>
+            </label>
+            <div class="col-sm-9">
             <input type="checkbox" data-toggle="switch" value="${feature.name}" id="feature-switch-${key}" ${checked}/>
             </div>
         </div>    

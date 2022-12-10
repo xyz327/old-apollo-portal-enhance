@@ -1,5 +1,10 @@
 var enhanceNavId = "apollo-enhance-nav";
 var featureId = "apollo-enhance-feature";
+import allFeature from "./allFeature.json";
+var allFeatureMap = {};
+allFeature.forEach((feature) => {
+  allFeatureMap[feature.name] = feature;
+});
 export function appendNavBar(child) {
   $(`#${enhanceNavId}`).append(child);
 }
@@ -42,13 +47,21 @@ loadFeature("nav", false, function () {
   GM_addStyle(highlight_xcode_css);
   GM_addStyle(text_different_css);
 })();
+
+export function getAllFeaturenMap() {
+  return allFeatureMap;
+}
 var onNamesacpeLoadedCbs = [];
+var firsetNamespaceLoaded = false;
 export function onNamesacpeLoaded(cb) {
   if (typeof cb === "function") {
     onNamesacpeLoadedCbs.push(cb);
   }
   return {
     then: function (cb) {
+      if (firsetNamespaceLoaded) {
+        cb();
+      }
       onNamesacpeLoadedCbs.push(cb);
     },
   };
@@ -71,6 +84,7 @@ loadFeature("onNamesacpeLoaded", true, function () {
   $.each($(".config-item-container"), (index, el) => {
     observer.observe(el, { childList: true });
   });
+  firsetNamespaceLoaded = true;
 });
 export function getAppId() {
   let hash = location.hash;
@@ -107,14 +121,33 @@ export function loadFeature(name, options, feature) {
 }
 
 export function isFeatureDisabled(name) {
-  return !!localStorage.getItem("featureDisbaled:" + name);
+  var disabled = featureState(name) === false;
+  if (disabled) {
+    return true;
+  }
+  // 默认开关
+  if (allFeatureMap[name] && !allFeatureMap[name].defaultEnabled) {
+    console.log(`loadFeature: ${name} has disabled by deafult`);
+    return true;
+  }
+  return false;
+}
+export function featureState(name, state) {
+  return featureTypeState(name, null, state);
+}
+export function featureTypeState(name, subtype, state) {
+  var feature = subtype ? name + "-" + subtype : name;
+  var stateMap = JSON.parse(localStorage.getItem("featureState")) || {};
+  if (state == undefined) {
+    // get
+    return stateMap[feature];
+  }
+  //set
+  stateMap[feature] = state;
+  localStorage.setItem("featureState", JSON.stringify(stateMap));
 }
 export function switchFeature(name, enabled) {
-  if (enabled) {
-    localStorage.removeItem("featureDisbaled:" + name);
-  } else {
-    localStorage.setItem("featureDisbaled:" + name, true);
-  }
+  featureState(name, enabled);
 }
 export function showDiffModal(key, newVal, oldVal) {
   const tdfh = new TextDifferentForHtml(

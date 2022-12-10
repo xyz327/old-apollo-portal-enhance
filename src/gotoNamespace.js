@@ -4,17 +4,12 @@ import { loadFeature, appendNavBar, onNamesacpeLoaded } from "./base";
 let inited = false;
 loadFeature("gotoNamespace", false, () => {
   if ($("#affixPlaceholder").length == 0) {
-    $("body>nav.navbar").after('<div id="affixPlaceholder"></div>');
-    $("body>nav.navbar").width("100%").css({ "z-index": 999 }).affix({
-      top: 0,
-    });
-    var $affixPlaceholder = $("#affixPlaceholder");
-    $("body>nav.navbar").on("affix.bs.affix", function (event) {
-      $affixPlaceholder.css("height", "50px");
-    });
-    $("body>nav.navbar").on("affix-top.bs.affix", function (event) {
-      $affixPlaceholder.css("height", "0px");
-    });
+    $("body>nav.navbar").after(
+      '<div id="affixPlaceholder" style="height:60px"></div>'
+    );
+    $("body>nav.navbar")
+      .width("100%")
+      .css({ "z-index": 999, position: "fixed" });
   }
   goToNamespace0();
   return true;
@@ -45,14 +40,14 @@ function refreshGogoNamespace() {
   });
 }
 function formatOptions(state) {
-  if(state.disabled){
+  if (state.disabled) {
     return state.text;
   }
   var namespaceScope = $(
     'div[ng-controller="ConfigNamespaceController"]'
   ).scope();
   var namespace = namespaceScope.namespaces.find((namespace) => {
-    return namespace.viewName === state.id
+    return namespace.viewName === state.id;
   });
   if (namespace.itemModifiedCnt > 0) {
     return $(
@@ -70,7 +65,7 @@ function buildGotoNamespace() {
   var namespaceScope = $(
     'div[ng-controller="ConfigNamespaceController"]'
   ).scope();
-  var optionsTpl = compiled({ namespaces:namespaceScope.namespaces });
+  var optionsTpl = compiled({ namespaces: namespaceScope.namespaces });
   appendNavBar(`
   <li id="goToNamespace" style="margin-top: 10px;">
   <select id="namespaceSelecter">${optionsTpl}</select>
@@ -81,30 +76,43 @@ function buildGotoNamespace() {
     $("#select2-namespaceSelecter-results").css({ "max-height": "600px" });
   });
 
-  var selectedVal;
-  var triggerBySelect = false;
   var htmlScroll = $("html").getNiceScroll(0);
-  htmlScroll.scrollend(function (e) {
-    if (triggerBySelect) {
-      triggerBySelect = false;
-      return;
-    }
-    //TODO 滚动页面时 自动定位 select 的选项
-    // var offsetY = e.end.y;
-    // var curNamespace = namespaceOffsets.find((val) => val.top > offsetY);
-    // if (curNamespace && selectedVal != curNamespace.id) {
-    //   //TODO
-    //   selectedVal = curNamespace.id;
-    //   $select.val(selectedVal).trigger("change");
-    // }
-  });
+  // 修改选项时 滚动页面到对应位置
   $select.on("select2:select", function (e) {
     var namespaceId = $select.val();
     console.log("select2:select", e, namespaceId);
     var namespaceEl = $(".namespace-name")
       .toArray()
       .find((el) => el.innerHTML == namespaceId);
-    triggerBySelect = true;
     htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
+  });
+
+  // 滚动页面时同步改变 当前选择的 namespace 选项
+  changeSelectedOnScroll($select);
+}
+
+function changeSelectedOnScroll($select) {
+  var selectedVal;
+  // 防抖
+  var listener = _.debounce(function (entries) {
+    if (entries.length == 0) {
+      return;
+    }
+    var entry = entries[0];
+    if (!entry.isIntersecting) {
+      // 从可视区移出
+      return;
+    }
+    var el = entry.target;
+    var curNamespace = $(el).text();
+    if (selectedVal != curNamespace) {
+      selectedVal = curNamespace;
+      $select.val(selectedVal).trigger("change");
+    }
+  }, 200);
+  const io = new IntersectionObserver(listener, { threshold: 1.0 });
+
+  $(".namespace-name").each((i, el) => {
+    io.observe(el);
   });
 }
