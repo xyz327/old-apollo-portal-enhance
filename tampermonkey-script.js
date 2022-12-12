@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         apollo-enhance
+// @name         apollo-enhance-v2
 // @namespace    apollo-enhance
 // @version      0.9.2
 // @description  make old apollo better
@@ -38,12 +38,12 @@
   	},
   	{
   		name: "fixNiceScroll",
-  		desc: "",
+  		desc: "修复 CTRL+F 搜索不能跳转的问题",
   		defaultEnabled: true
   	},
   	{
   		name: "gotoNamespace",
-  		desc: "",
+  		desc: "一键跳转到对应的 namespace",
   		defaultEnabled: true
   	},
   	{
@@ -70,7 +70,7 @@
   	{
   		name: "prodWarn",
   		desc: "操作线上环境提示",
-  		defaultEnabled: true
+  		defaultEnabled: false
   	}
   ];
 
@@ -977,7 +977,7 @@
   });
   function buildSettings() {
     initSettingsModal();
-    $('[data-toggle="switch"]')
+    $('[data-toggle=switch]')
       .bootstrapSwitch({
         onText: "开启",
         offText: "关闭",
