@@ -14,7 +14,7 @@ loadFeature("settings", { switch: false }, function () {
 });
 function buildSettings() {
   initSettingsModal();
-  $('[data-toggle="switch"]')
+  $('[data-toggle=switch]')
     .bootstrapSwitch({
       onText: "开启",
       offText: "关闭",
