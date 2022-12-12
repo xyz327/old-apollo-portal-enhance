@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      0.9.1
+// @version      0.9.2
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -25,8 +25,61 @@
 (function (_) {
   'use strict';
 
+  var allFeature = [
+  	{
+  		name: "disableScrollOnModal",
+  		desc: "",
+  		defaultEnabled: true
+  	},
+  	{
+  		name: "fixEnvTab",
+  		desc: "",
+  		defaultEnabled: true
+  	},
+  	{
+  		name: "fixNiceScroll",
+  		desc: "修复 CTRL+F 搜索不能跳转的问题",
+  		defaultEnabled: true
+  	},
+  	{
+  		name: "gotoNamespace",
+  		desc: "一键跳转到对应的 namespace",
+  		defaultEnabled: true
+  	},
+  	{
+  		name: "releaseDiff",
+  		desc: "发布界面差异对比",
+  		defaultEnabled: true
+  	},
+  	{
+  		name: "releaseModal",
+  		desc: "发布界面增强",
+  		defaultEnabled: true
+  	},
+  	{
+  		name: "showText",
+  		desc: "单 key 差异对比",
+  		defaultEnabled: true
+  	},
+  	{
+  		name: "stash",
+  		desc: "",
+  		defaultEnabled: false,
+  		enabledWarn: "实验性功能,请谨慎操作"
+  	},
+  	{
+  		name: "prodWarn",
+  		desc: "操作线上环境提示",
+  		defaultEnabled: false
+  	}
+  ];
+
   var enhanceNavId = "apollo-enhance-nav";
   var featureId = "apollo-enhance-feature";
+  var allFeatureMap = {};
+  allFeature.forEach((feature) => {
+    allFeatureMap[feature.name] = feature;
+  });
   function appendNavBar(child) {
     $(`#${enhanceNavId}`).append(child);
   }
@@ -69,13 +122,21 @@
     GM_addStyle(highlight_xcode_css);
     GM_addStyle(text_different_css);
   })();
+
+  function getAllFeaturenMap() {
+    return allFeatureMap;
+  }
   var onNamesacpeLoadedCbs = [];
+  var firsetNamespaceLoaded = false;
   function onNamesacpeLoaded(cb) {
     if (typeof cb === "function") {
       onNamesacpeLoadedCbs.push(cb);
     }
     return {
       then: function (cb) {
+        if (firsetNamespaceLoaded) {
+          cb();
+        }
         onNamesacpeLoadedCbs.push(cb);
       },
     };
@@ -98,6 +159,7 @@
     $.each($(".config-item-container"), (index, el) => {
       observer.observe(el, { childList: true });
     });
+    firsetNamespaceLoaded = true;
   });
   function getAppId() {
     let hash = location.hash;
@@ -134,14 +196,33 @@
   }
 
   function isFeatureDisabled(name) {
-    return !!localStorage.getItem("featureDisbaled:" + name);
+    var disabled = featureState(name) === false;
+    if (disabled) {
+      return true;
+    }
+    // 默认开关
+    if (allFeatureMap[name] && !allFeatureMap[name].defaultEnabled) {
+      console.log(`loadFeature: ${name} has disabled by deafult`);
+      return true;
+    }
+    return false;
+  }
+  function featureState(name, state) {
+    return featureTypeState(name, null, state);
+  }
+  function featureTypeState(name, subtype, state) {
+    var feature = subtype ? name + "-" + subtype : name;
+    var stateMap = JSON.parse(localStorage.getItem("featureState")) || {};
+    if (state == undefined) {
+      // get
+      return stateMap[feature];
+    }
+    //set
+    stateMap[feature] = state;
+    localStorage.setItem("featureState", JSON.stringify(stateMap));
   }
   function switchFeature(name, enabled) {
-    if (enabled) {
-      localStorage.removeItem("featureDisbaled:" + name);
-    } else {
-      localStorage.setItem("featureDisbaled:" + name, true);
-    }
+    featureState(name, enabled);
   }
   function showDiffModal(key, newVal, oldVal) {
     const tdfh = new TextDifferentForHtml(
@@ -325,17 +406,12 @@
   let inited = false;
   loadFeature("gotoNamespace", false, () => {
     if ($("#affixPlaceholder").length == 0) {
-      $("body>nav.navbar").after('<div id="affixPlaceholder"></div>');
-      $("body>nav.navbar").width("100%").css({ "z-index": 999 }).affix({
-        top: 0,
-      });
-      var $affixPlaceholder = $("#affixPlaceholder");
-      $("body>nav.navbar").on("affix.bs.affix", function (event) {
-        $affixPlaceholder.css("height", "50px");
-      });
-      $("body>nav.navbar").on("affix-top.bs.affix", function (event) {
-        $affixPlaceholder.css("height", "0px");
-      });
+      $("body>nav.navbar").after(
+        '<div id="affixPlaceholder" style="height:60px"></div>'
+      );
+      $("body>nav.navbar")
+        .width("100%")
+        .css({ "z-index": 999, position: "fixed" });
     }
     goToNamespace0();
     return true;
@@ -366,14 +442,14 @@
     });
   }
   function formatOptions(state) {
-    if(state.disabled){
+    if (state.disabled) {
       return state.text;
     }
     var namespaceScope = $(
       'div[ng-controller="ConfigNamespaceController"]'
     ).scope();
     var namespace = namespaceScope.namespaces.find((namespace) => {
-      return namespace.viewName === state.id
+      return namespace.viewName === state.id;
     });
     if (namespace.itemModifiedCnt > 0) {
       return $(
@@ -391,7 +467,7 @@
     var namespaceScope = $(
       'div[ng-controller="ConfigNamespaceController"]'
     ).scope();
-    var optionsTpl = compiled({ namespaces:namespaceScope.namespaces });
+    var optionsTpl = compiled({ namespaces: namespaceScope.namespaces });
     appendNavBar(`
   <li id="goToNamespace" style="margin-top: 10px;">
   <select id="namespaceSelecter">${optionsTpl}</select>
@@ -401,30 +477,45 @@
     $select.on("select2:open", function (e) {
       $("#select2-namespaceSelecter-results").css({ "max-height": "600px" });
     });
-    var triggerBySelect = false;
+
     var htmlScroll = $("html").getNiceScroll(0);
-    htmlScroll.scrollend(function (e) {
-      if (triggerBySelect) {
-        triggerBySelect = false;
-        return;
-      }
-      //TODO 滚动页面时 自动定位 select 的选项
-      // var offsetY = e.end.y;
-      // var curNamespace = namespaceOffsets.find((val) => val.top > offsetY);
-      // if (curNamespace && selectedVal != curNamespace.id) {
-      //   //TODO
-      //   selectedVal = curNamespace.id;
-      //   $select.val(selectedVal).trigger("change");
-      // }
-    });
+    // 修改选项时 滚动页面到对应位置
     $select.on("select2:select", function (e) {
       var namespaceId = $select.val();
       console.log("select2:select", e, namespaceId);
       var namespaceEl = $(".namespace-name")
         .toArray()
         .find((el) => el.innerHTML == namespaceId);
-      triggerBySelect = true;
       htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
+    });
+
+    // 滚动页面时同步改变 当前选择的 namespace 选项
+    changeSelectedOnScroll($select);
+  }
+
+  function changeSelectedOnScroll($select) {
+    var selectedVal;
+    // 防抖
+    var listener = _.debounce(function (entries) {
+      if (entries.length == 0) {
+        return;
+      }
+      var entry = entries[0];
+      if (!entry.isIntersecting) {
+        // 从可视区移出
+        return;
+      }
+      var el = entry.target;
+      var curNamespace = $(el).text();
+      if (selectedVal != curNamespace) {
+        selectedVal = curNamespace;
+        $select.val(selectedVal).trigger("change");
+      }
+    }, 200);
+    const io = new IntersectionObserver(listener, { threshold: 1.0 });
+
+    $(".namespace-name").each((i, el) => {
+      io.observe(el);
     });
   }
 
@@ -881,61 +972,52 @@
       return env && env === 'PRO'
   }
 
-  var allFeature = [
-  	{
-  		name: "disableScrollOnModal",
-  		desc: ""
-  	},
-  	{
-  		name: "fixEnvTab",
-  		desc: ""
-  	},
-  	{
-  		name: "fixNiceScroll",
-  		desc: ""
-  	},
-  	{
-  		name: "gotoNamespace",
-  		desc: ""
-  	},
-  	{
-  		name: "releaseDiff",
-  		desc: ""
-  	},
-  	{
-  		name: "releaseModal",
-  		desc: ""
-  	},
-  	{
-  		name: "showText",
-  		desc: ""
-  	},
-  	{
-  		name: "stash",
-  		desc: ""
-  	},
-  	{
-  		name: "prodWarn",
-  		desc: ""
-  	}
-  ];
-
   loadFeature("settings", { switch: false }, function () {
     buildSettings();
   });
   function buildSettings() {
-
-
     initSettingsModal();
-    $('[data-toggle="switch"]')
-    .bootstrapSwitch({
-      onText: '开启',
-      offText: '关闭'
-    })
-    .on('switchChange.bootstrapSwitch', function(event, state) {
-      var feature = $(this).val();
-      switchFeature(feature, state);
-    });
+    $('[data-toggle=switch]')
+      .bootstrapSwitch({
+        onText: "开启",
+        offText: "关闭",
+        onSwitchChange: function (event, state) {
+          console.log(arguments);
+          if (!state) {
+            return;
+          }
+          var $el = $(this);
+          var featureName = $el.val();
+          var feature = getAllFeaturenMap()[featureName];
+          if (
+            feature &&
+            !featureTypeState(featureName, "enabledWarn") &&
+            feature.enabledWarn
+          ) {
+            layer.confirm(
+              feature.enabledWarn,
+              {
+                btn: ["确定", "取消"],
+              },
+              function (index) {
+                featureTypeState(featureName, "enabledWarn", true);
+                $el.bootstrapSwitch("state", true);
+                layer.close(index);
+              },
+              function () {}
+            );
+            return false;
+          }
+        },
+      })
+      .on("switchChange.bootstrapSwitch", function (event, state) {
+        var featureName = $(this).val();
+        switchFeature(featureName, state);
+        console.log(state);
+        if(!state){
+          featureTypeState(featureName, "enabledWarn", false);
+        }
+      });
 
     appendNavBar(`
   <li>
@@ -958,8 +1040,10 @@
       var checked = isFeatureDisabled(feature.name) ? "" : "checked";
       tpl += `
         <div class="form-group">
-            <label class="col-sm-2 control-label" for="feature-switch-${key}">${feature.name}</label>
-            <div class="col-sm-10">
+            <label class="col-sm-3 control-label" for="feature-switch-${key}">${feature.name}
+            <span class="glyphicon glyphicon-question-sign" data-tooltip="tooltip" title="${feature.desc}"></span>
+            </label>
+            <div class="col-sm-9">
             <input type="checkbox" data-toggle="switch" value="${feature.name}" id="feature-switch-${key}" ${checked}/>
             </div>
         </div>    
