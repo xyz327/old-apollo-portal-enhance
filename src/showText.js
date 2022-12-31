@@ -11,10 +11,7 @@ loadFeature("showText", true, function () {
       title: "点击查看差异对比",
     })
     .on("click", function () {
-      if (!currItem) {
-        return;
-      }
-      if (currItem.isModified) {
+      if (currItem && currItem.isModified) {
         showDiffModal(currItem.item.key, currItem.newValue, currItem.oldValue);
       }
     });

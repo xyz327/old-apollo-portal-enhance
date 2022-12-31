@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      0.9.2
+// @version      0.9.3
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -196,8 +196,13 @@
   }
 
   function isFeatureDisabled(name) {
-    var disabled = featureState(name) === false;
-    if (disabled) {
+    var state = featureState(name);
+    if (state === true) {
+      // 明确设置过为启用
+      return false;
+    }
+    if (state === false) {
+      // 明确设置过为不启用
       return true;
     }
     // 默认开关
@@ -224,21 +229,7 @@
   function switchFeature(name, enabled) {
     featureState(name, enabled);
   }
-  function showDiffModal(key, newVal, oldVal) {
-    const tdfh = new TextDifferentForHtml(
-      $("#diff-container")[0], // The dom used to render the display code
-      "json" // Type of code
-    );
-    $("#diff-detail-title").html(`${key}`);
-    $("#copyOld").attr("data-copy-value", oldVal);
-    $("#copyNew").attr("data-copy-value", newVal);
-    tdfh.render({
-      oldCode: toPerttyJson(oldVal), // Old code
-      newCode: toPerttyJson(newVal), // New code
-      hasLineNumber: false, // Whether to display the line number
-    });
-    $("#diffModal").modal();
-  }
+
 
   function copy(content) {
     return new Promise(function (res, rej) {
@@ -288,10 +279,25 @@
     $("body").prepend(`<div id="${featureId}" class="hidden"></div>`);
   }
 
+  function showDiffModal(key, newVal, oldVal) {
+    const tdfh = new TextDifferentForHtml(
+      $("#diff-container")[0], // The dom used to render the display code
+      "json" // Type of code
+    );
+    $("#diff-detail-title").html(`${key}`);
+    $("#copyOld").attr("data-copy-value", oldVal);
+    $("#copyNew").attr("data-copy-value", newVal);
+    tdfh.render({
+      oldCode: toPerttyJson(oldVal), // Old code
+      newCode: toPerttyJson(newVal), // New code
+      hasLineNumber: false, // Whether to display the line number
+    });
+    $("#diffModal").modal();
+  }
   function initDiffModal() {
     $("body").append(`
       <!-- Modal -->
-      <div class="modal fade" id="diffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal" id="diffModal" tabindex="-1" role="dialog" aria-labelledby="diffModal">
         <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -336,8 +342,8 @@
       }
       const infoVal = sessionStorage[getAppId()];
       const infoObj = JSON.parse(infoVal);
-      const cluster = infoObj.cluster;
-      const env = infoObj.env;
+      infoObj.cluster;
+      infoObj.env;
       var $panelHeader = $tab.find(".panel-heading:first");
       var $curEnvInfo = $panelHeader.find("#curEnvInfo");
       if ($curEnvInfo.length == 0) {
@@ -347,8 +353,11 @@
         $panelHeader.append(`<div id="curEnvInfo"></div>`);
         $curEnvInfo = $panelHeader.find("#curEnvInfo");
       }
+
+      var $scope = $('div[ng-controller="ConfigBaseInfoController"]').scope();
+      var pageContext = $scope.pageContext;
       $curEnvInfo.html(`
-    <span class="label label-success">${env}</span> - <span class="label label-info">${cluster}</span>
+    <span class="label label-success">${pageContext.env}</span> - <span class="label label-info">${pageContext.clusterName}</span>
     `);
       if (!isReloadByHash) {
         // 不是通过 hash change reload 的才需要绑定事件
@@ -374,7 +383,7 @@
         });
         $tab.affix({
           offset: {
-            top: 50,
+            top: 0,
           },
         });
       }
@@ -388,18 +397,17 @@
       .on("shown.bs.modal", function () {
         openModalCnt++;
         $("html").css("overflow", "hidden");
+        $("body").css("overflow", "hidden");
         htmlScroller.hide();
       })
       .on("hidden.bs.modal", function () {
         openModalCnt--;
         if (openModalCnt <= 0) {
           $("html").css("overflow", "");
+          $("body").css("overflow", "");
           htmlScroller.show();
         }
       });
-    $("body").on("scroll", ".modal.in", function () {
-      return false;
-    });
     return true;
   });
 
@@ -684,10 +692,7 @@
         title: "点击查看差异对比",
       })
       .on("click", function () {
-        if (!currItem) {
-          return;
-        }
-        if (currItem.isModified) {
+        if (currItem && currItem.isModified) {
           showDiffModal(currItem.item.key, currItem.newValue, currItem.oldValue);
         }
       });
