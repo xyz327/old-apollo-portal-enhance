@@ -19,8 +19,11 @@ loadFeature("fixEnvTab", true, function (isReloadByHash) {
       $panelHeader.append(`<div id="curEnvInfo"></div>`);
       $curEnvInfo = $panelHeader.find("#curEnvInfo");
     }
+
+    var $scope = $('div[ng-controller="ConfigBaseInfoController"]').scope();
+    var pageContext = $scope.pageContext
     $curEnvInfo.html(`
-    <span class="label label-success">${env}</span> - <span class="label label-info">${cluster}</span>
+    <span class="label label-success">${pageContext.env}</span> - <span class="label label-info">${pageContext.clusterName}</span>
     `);
     if (!isReloadByHash) {
       // 不是通过 hash change reload 的才需要绑定事件
@@ -46,7 +49,7 @@ loadFeature("fixEnvTab", true, function (isReloadByHash) {
       });
       $tab.affix({
         offset: {
-          top: 50,
+          top: 0,
         },
       });
     }
