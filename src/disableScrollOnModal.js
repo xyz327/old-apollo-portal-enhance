@@ -8,14 +8,14 @@ loadFeature("disableScrollOnModal", false, function () {
       openModalCnt++;
       //$("html").css("overflow", "hidden");
       $("body").css("overflow", "hidden");
-      htmlScroller.hide();
+      //htmlScroller.hide();
     })
     .on("hidden.bs.modal", function () {
       openModalCnt--;
       if (openModalCnt <= 0) {
         //$("html").css("overflow", "");
         $("body").css("overflow", "");
-        htmlScroller.show();
+       // htmlScroller.show();
       }
     });
   return true;
