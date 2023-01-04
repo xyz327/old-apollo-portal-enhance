@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      0.9.3
+// @version      0.9.4
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -258,7 +258,7 @@
 
   function loadFeature0(name, feature, isReloadByHash) {
     try {
-      if ($("#feature-" + name).length !== 0) {
+      if (!isReloadByHash && $("#feature-" + name).length !== 0) {
         // 已经加载过了
         console.log(`loadFeature: ${name} has loaded`);
         return;
@@ -383,7 +383,7 @@
         });
         $tab.affix({
           offset: {
-            top: 0,
+            top: 60,
           },
         });
       }
@@ -396,14 +396,14 @@
     $("body")
       .on("shown.bs.modal", function () {
         openModalCnt++;
-        $("html").css("overflow", "hidden");
+        //$("html").css("overflow", "hidden");
         $("body").css("overflow", "hidden");
         htmlScroller.hide();
       })
       .on("hidden.bs.modal", function () {
         openModalCnt--;
         if (openModalCnt <= 0) {
-          $("html").css("overflow", "");
+          //$("html").css("overflow", "");
           $("body").css("overflow", "");
           htmlScroller.show();
         }

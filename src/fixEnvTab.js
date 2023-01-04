@@ -49,7 +49,7 @@ loadFeature("fixEnvTab", true, function (isReloadByHash) {
       });
       $tab.affix({
         offset: {
-          top: 0,
+          top: 60,
         },
       });
     }

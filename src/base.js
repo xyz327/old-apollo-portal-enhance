@@ -183,7 +183,7 @@ function toPerttyJson(val) {
 
 function loadFeature0(name, feature, isReloadByHash) {
   try {
-    if ($("#feature-" + name).length !== 0) {
+    if (!isReloadByHash && $("#feature-" + name).length !== 0) {
       // 已经加载过了
       console.log(`loadFeature: ${name} has loaded`);
       return;
