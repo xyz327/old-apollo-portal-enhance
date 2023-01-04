@@ -121,13 +121,8 @@ export function loadFeature(name, options, feature) {
 }
 
 export function isFeatureDisabled(name) {
-  var state = featureState(name);
-  if (state === true) {
-    // 明确设置过为启用
-    return false;
-  }
-  if (state === false) {
-    // 明确设置过为不启用
+  var disabled = featureState(name) === false;
+  if (disabled) {
     return true;
   }
   // 默认开关
@@ -154,7 +149,21 @@ export function featureTypeState(name, subtype, state) {
 export function switchFeature(name, enabled) {
   featureState(name, enabled);
 }
-
+export function showDiffModal(key, newVal, oldVal) {
+  const tdfh = new TextDifferentForHtml(
+    $("#diff-container")[0], // The dom used to render the display code
+    "json" // Type of code
+  );
+  $("#diff-detail-title").html(`${key}`);
+  $("#copyOld").attr("data-copy-value", oldVal);
+  $("#copyNew").attr("data-copy-value", newVal);
+  tdfh.render({
+    oldCode: toPerttyJson(oldVal), // Old code
+    newCode: toPerttyJson(newVal), // New code
+    hasLineNumber: false, // Whether to display the line number
+  });
+  $("#diffModal").modal();
+}
 
 export function copy(content) {
   return new Promise(function (res, rej) {
@@ -204,25 +213,10 @@ function initFeatureId() {
   $("body").prepend(`<div id="${featureId}" class="hidden"></div>`);
 }
 
-export function showDiffModal(key, newVal, oldVal) {
-  const tdfh = new TextDifferentForHtml(
-    $("#diff-container")[0], // The dom used to render the display code
-    "json" // Type of code
-  );
-  $("#diff-detail-title").html(`${key}`);
-  $("#copyOld").attr("data-copy-value", oldVal);
-  $("#copyNew").attr("data-copy-value", newVal);
-  tdfh.render({
-    oldCode: toPerttyJson(oldVal), // Old code
-    newCode: toPerttyJson(newVal), // New code
-    hasLineNumber: false, // Whether to display the line number
-  });
-  $("#diffModal").modal();
-}
 function initDiffModal() {
   $("body").append(`
       <!-- Modal -->
-      <div class="modal" id="diffModal" tabindex="-1" role="dialog" aria-labelledby="diffModal">
+      <div class="modal fade" id="diffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
