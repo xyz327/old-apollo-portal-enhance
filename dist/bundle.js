@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         apollo-enhance
+// @name         apollo-enhance-v2
 // @namespace    apollo-enhance
 // @version      0.9.4
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
 // @source       https://github.com/xyz327/old-apollo-portal-enhance
-// @downloadURL  https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/tampermonkey-script.js
-// @updateURL    https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/tampermonkey-script.js
+// @downloadURL  https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/dist/bundle.js
+// @updateURL    https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/dist/bundle.js
 // @author       xizhou
 // @match        *://*/config.html*
 // @resource     highlight_xcode_css https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/9.18.5/styles/xcode.min.css

@@ -1,0 +1,48 @@
+[
+  {
+    "name": "disableScrollOnModal",
+    "desc": "",
+    "defaultEnabled": true
+  },
+  {
+    "name": "fixEnvTab",
+    "desc": "",
+    "defaultEnabled": true
+  },
+  {
+    "name": "fixNiceScroll",
+    "desc": "修复 CTRL+F 搜索不能跳转的问题",
+    "defaultEnabled": true
+  },
+  {
+    "name": "gotoNamespace",
+    "desc": "一键跳转到对应的 namespace",
+    "defaultEnabled": true
+  },
+  {
+    "name": "releaseDiff",
+    "desc": "发布界面差异对比",
+    "defaultEnabled": true
+  },
+  {
+    "name": "releaseModal",
+    "desc": "发布界面增强",
+    "defaultEnabled": true
+  },
+  {
+    "name": "showText",
+    "desc": "单 key 差异对比",
+    "defaultEnabled": true
+  },
+  {
+    "name": "stash",
+    "desc": "",
+    "defaultEnabled": false,
+    "enabledWarn": "实验性功能,请谨慎操作"
+  },
+  {
+    "name": "prodWarn",
+    "desc": "操作线上环境提示",
+    "defaultEnabled": false
+  }
+]
