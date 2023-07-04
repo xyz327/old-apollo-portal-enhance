@@ -44,5 +44,10 @@
     "name": "prodWarn",
     "desc": "操作线上环境提示",
     "defaultEnabled": false
+  },
+  {
+    "name": "copyNamespace",
+    "desc": "复制namespace",
+    "defaultEnabled": true
   }
 ]

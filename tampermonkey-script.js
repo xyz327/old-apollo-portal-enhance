@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.9.4
+// @version      0.9.5
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -71,6 +71,11 @@
   		name: "prodWarn",
   		desc: "操作线上环境提示",
   		defaultEnabled: false
+  	},
+  	{
+  		name: "copyNamespace",
+  		desc: "复制namespace",
+  		defaultEnabled: true
   	}
   ];
 
@@ -95,7 +100,8 @@
   (function () {
     initFeatureId();
     initDiffModal();
-    $("[data-copy]").on("click", function (e) {
+    // 绑定复制事件
+    $(document).on("click", "[data-copy]", function (e) {
       copy($(e.currentTarget).attr("data-copy-value")).then(function () {
         var $icon = $(e.target).parent().find(".glyphicon");
         $icon.removeClass("glyphicon-duplicate").addClass("glyphicon-ok");
@@ -1073,6 +1079,24 @@
         </div>
         `);
   }
+
+  loadFeature("copyNamespace", false, function () {
+    onNamesacpeLoaded(function () {
+      $("header.panel-heading .header-namespace>span:first-child")
+        .toArray()
+        .forEach(function (el) {
+          var name = el.innerText.trim();
+          $(el).next("span").after(`
+        <span data-tooltip="tooltip" title="点击复制namespace" data-copy="copy"
+         data-copy-value="${name}" class="label label-success">复制
+        <label class="glyphicon glyphicon-duplicate"></label>
+        </span>
+        `);
+        });
+    });
+
+    return true;
+  });
 
   loadFeature("main", { switch: false }, function () {
     $("body").trigger("featureLoaded");

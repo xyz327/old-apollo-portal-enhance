@@ -11,6 +11,7 @@ import "./stash";
 import "./help";
 import "./prodWarn";
 import "./settings";
+import "./copyNamespace";
 
 loadFeature("main", { switch: false }, function () {
   $("body").trigger("featureLoaded");
