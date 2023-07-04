@@ -20,7 +20,8 @@ loadFeature("nav", false, function () {
 (function () {
   initFeatureId();
   initDiffModal();
-  $("[data-copy]").on("click", function (e) {
+  // 绑定复制事件
+  $(document).on("click", "[data-copy]", function (e) {
     copy($(e.currentTarget).attr("data-copy-value")).then(function () {
       var $icon = $(e.target).parent().find(".glyphicon");
       $icon.removeClass("glyphicon-duplicate").addClass("glyphicon-ok");
