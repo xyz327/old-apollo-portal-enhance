@@ -9,12 +9,16 @@ import {
 } from "./base";
 import allFeature from "./allFeature.json";
 
-loadFeature("settings", { switch: false }, function () {
-  buildSettings();
-});
+loadFeature(
+  "settings",
+  { switch: false, reloadOnHashChange: false },
+  function () {
+    buildSettings();
+  }
+);
 function buildSettings() {
   initSettingsModal();
-  $('[data-toggle=switch]')
+  $("[data-toggle=switch]")
     .bootstrapSwitch({
       onText: "开启",
       offText: "关闭",
@@ -33,9 +37,7 @@ function buildSettings() {
         ) {
           layer.confirm(
             feature.enabledWarn,
-            {
-              btn: ["确定", "取消"],
-            },
+            { icon: 3, btn: ["确定", "取消"] },
             function (index) {
               featureTypeState(featureName, "enabledWarn", true);
               $el.bootstrapSwitch("state", true);
@@ -50,8 +52,8 @@ function buildSettings() {
     .on("switchChange.bootstrapSwitch", function (event, state) {
       var featureName = $(this).val();
       switchFeature(featureName, state);
-      console.log(state)
-      if(!state){
+      console.log(state);
+      if (!state) {
         featureTypeState(featureName, "enabledWarn", false);
       }
     });
@@ -76,11 +78,11 @@ function initSettingsModal() {
     var key = feature.name.replace(".", "-");
     var checked = isFeatureDisabled(feature.name) ? "" : "checked";
     tpl += `
-        <div class="form-group">
-            <label class="col-sm-3 control-label" for="feature-switch-${key}">${feature.name}
+        <div class="form-group" style="width:45%;margin:5px 0px;">
+            <label class="col-sm-6 control-label" for="feature-switch-${key}">${feature.name}
             <span class="glyphicon glyphicon-question-sign" data-tooltip="tooltip" title="${feature.desc}"></span>
             </label>
-            <div class="col-sm-9">
+            <div class="col-sm-6">
             <input type="checkbox" data-toggle="switch" value="${feature.name}" id="feature-switch-${key}" ${checked}/>
             </div>
         </div>    
@@ -96,7 +98,7 @@ function initSettingsModal() {
                 <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效)</h4>
               </div>
               <div class="modal-body" >
-              <form class="form-horizontal">
+              <form class="form-inline">
               ${tpl}
               </form>
               </div>

@@ -12,6 +12,7 @@ import "./help";
 import "./prodWarn";
 import "./settings";
 import "./copyNamespace";
+import "./prodWarnDisabled";
 
 loadFeature("main", { switch: false }, function () {
   $("body").trigger("featureLoaded");

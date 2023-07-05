@@ -6,9 +6,13 @@ loadFeature("copyNamespace", false, function () {
       .toArray()
       .forEach(function (el) {
         var name = el.innerText.trim();
-        $(el).next("span").after(`
+        var $el = $(el);
+        if ($el.nextAll(".copyNamespace").length != 0) {
+          return;
+        }
+        $el.next("span").after(`
         <span data-tooltip="tooltip" title="点击复制namespace" data-copy="copy"
-         data-copy-value="${name}" class="label label-success">复制
+         data-copy-value="${name}" class="copyNamespace label label-success">复制
         <label class="glyphicon glyphicon-duplicate"></label>
         </span>
         `);

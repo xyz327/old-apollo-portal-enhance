@@ -33,7 +33,7 @@
   	},
   	{
   		name: "fixEnvTab",
-  		desc: "",
+  		desc: "固定左侧菜单",
   		defaultEnabled: true
   	},
   	{
@@ -76,6 +76,12 @@
   		name: "copyNamespace",
   		desc: "复制namespace",
   		defaultEnabled: true
+  	},
+  	{
+  		name: "prodWarnDisable",
+  		desc: "谨慎使用",
+  		defaultEnabled: false,
+  		enabledWarn: "实验性功能,请谨慎操作"
   	}
   ];
 
@@ -110,7 +116,7 @@
         }, 2000);
       });
     });
-    // 加载 layer  依赖 $
+    // 加载 layer  因为依赖 $ 所以在代码里面进行加载
     GM_addElement("script", {
       src: "https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
       type: "text/javascript",
@@ -127,6 +133,7 @@
     const text_different_css = GM_getResourceText("text_different_css");
     GM_addStyle(highlight_xcode_css);
     GM_addStyle(text_different_css);
+    
   })();
 
   function getAllFeaturenMap() {
@@ -668,23 +675,35 @@
   }
 
   loadFeature("releaseModal", true, function () {
-      $('#releaseModal div.modal-header .modal-title:not(".ng-hide")')
-      .append(`<span id="goReleaseMoadlBottom" class="glyphicon glyphicon-circle-arrow-down" data-tooltip="tooltip" data-placement="top" title="定位到发布按钮"></span>`);
-
-      $('#releaseModal div.modal-footer')
-      .prepend(`
+    if ($("#goReleaseMoadlBottom").length == 0) {
+      $('#releaseModal div.modal-header .modal-title:not(".ng-hide")').append(
+        `<span id="goReleaseMoadlBottom" class="glyphicon glyphicon-circle-arrow-down" data-tooltip="tooltip" data-placement="top" title="定位到发布按钮"></span>`
+      );
+      $("#goReleaseMoadlBottom").affix({
+        offset: {
+          top: 10,
+        },
+      });
+    }
+    if ($("#goReleaseMoadlTop").length == 0) {
+      $("#releaseModal div.modal-footer").prepend(`
     <span id="goReleaseMoadlTop" class="pull-left glyphicon glyphicon-circle-arrow-up" data-tooltip="tooltip" data-placement="top" title="回到顶部"></span>`);
+      $("#goReleaseMoadlTop").affix({
+        offset: {
+          bottom: 10,
+        },
+      });
+    }
+    // for scroll
+    var nicesocre = $("#releaseModal").niceScroll({ cursoropacitymax: 0 });
+    $("#goReleaseMoadlBottom").on("click", function () {
+      nicesocre.doScrollTop($("#goReleaseMoadlTop").offset().top, 1000);
+    });
 
-      // for scroll
-      var nicesocre = $('#releaseModal').niceScroll({cursoropacitymax: 0});
-      $('#goReleaseMoadlBottom').on('click',function(){
-          nicesocre.doScrollTop($('#goReleaseMoadlTop').offset().top, 1000);
-      });
-     
-      $('#goReleaseMoadlTop').on('click',function(){
-          nicesocre.doScrollTop($('#goReleaseMoadlBottom').offset().top, 1000);
-      });
-      return true;
+    $("#goReleaseMoadlTop").on("click", function () {
+      nicesocre.doScrollTop($("#goReleaseMoadlBottom").offset().top, 1000);
+    });
+    return true;
   });
 
   loadFeature("showText", true, function () {
@@ -968,7 +987,7 @@
         'div[ng-controller="ConfigNamespaceController"]'
       ).scope();
       var env = namespaceScope.pageContext.env;
-      if (!isProd(env)){
+      if (!isProd$1(env)){
           return;
       }
       layer.open({
@@ -979,16 +998,20 @@
       });
     });
   }
-  function isProd(env){
+  function isProd$1(env){
       return env && env === 'PRO'
   }
 
-  loadFeature("settings", { switch: false }, function () {
-    buildSettings();
-  });
+  loadFeature(
+    "settings",
+    { switch: false, reloadOnHashChange: false },
+    function () {
+      buildSettings();
+    }
+  );
   function buildSettings() {
     initSettingsModal();
-    $('[data-toggle=switch]')
+    $("[data-toggle=switch]")
       .bootstrapSwitch({
         onText: "开启",
         offText: "关闭",
@@ -1007,9 +1030,7 @@
           ) {
             layer.confirm(
               feature.enabledWarn,
-              {
-                btn: ["确定", "取消"],
-              },
+              { icon: 3, btn: ["确定", "取消"] },
               function (index) {
                 featureTypeState(featureName, "enabledWarn", true);
                 $el.bootstrapSwitch("state", true);
@@ -1025,7 +1046,7 @@
         var featureName = $(this).val();
         switchFeature(featureName, state);
         console.log(state);
-        if(!state){
+        if (!state) {
           featureTypeState(featureName, "enabledWarn", false);
         }
       });
@@ -1050,11 +1071,11 @@
       var key = feature.name.replace(".", "-");
       var checked = isFeatureDisabled(feature.name) ? "" : "checked";
       tpl += `
-        <div class="form-group">
-            <label class="col-sm-3 control-label" for="feature-switch-${key}">${feature.name}
+        <div class="form-group" style="width:45%;margin:5px 0px;">
+            <label class="col-sm-6 control-label" for="feature-switch-${key}">${feature.name}
             <span class="glyphicon glyphicon-question-sign" data-tooltip="tooltip" title="${feature.desc}"></span>
             </label>
-            <div class="col-sm-9">
+            <div class="col-sm-6">
             <input type="checkbox" data-toggle="switch" value="${feature.name}" id="feature-switch-${key}" ${checked}/>
             </div>
         </div>    
@@ -1070,7 +1091,7 @@
                 <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效)</h4>
               </div>
               <div class="modal-body" >
-              <form class="form-horizontal">
+              <form class="form-inline">
               ${tpl}
               </form>
               </div>
@@ -1086,9 +1107,13 @@
         .toArray()
         .forEach(function (el) {
           var name = el.innerText.trim();
-          $(el).next("span").after(`
+          var $el = $(el);
+          if ($el.nextAll(".copyNamespace").length != 0) {
+            return;
+          }
+          $el.next("span").after(`
         <span data-tooltip="tooltip" title="点击复制namespace" data-copy="copy"
-         data-copy-value="${name}" class="label label-success">复制
+         data-copy-value="${name}" class="copyNamespace label label-success">复制
         <label class="glyphicon glyphicon-duplicate"></label>
         </span>
         `);
@@ -1097,6 +1122,35 @@
 
     return true;
   });
+
+  loadFeature("prodWarnDisable", false, function () {
+    prodWarnDisable();
+  });
+
+  function prodWarnDisable() {
+
+    var $btn = $("#releaseModal div.modal-footer").find("button[type=submit]");
+    $btn.click(function (e) {
+      var namespaceScope = $(
+        'div[ng-controller="ConfigNamespaceController"]'
+      ).scope();
+      var env = namespaceScope.pageContext.env;
+      if (!isProd(env)){
+          return;
+      }
+      if (!isProd(env)) {
+        return;
+      }
+      if (!isFeatureDisabled("prodWarnDisable")) {
+        if (confirm("已关闭生产环境发布校验，是否继续？")) {
+          namespaceScope.$root.userName = "disabledProdWarn";
+        }
+      }
+    });
+  }
+  function isProd(env) {
+    return env && env === "PRO";
+  }
 
   loadFeature("main", { switch: false }, function () {
     $("body").trigger("featureLoaded");
