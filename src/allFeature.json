@@ -6,7 +6,7 @@
   },
   {
     "name": "fixEnvTab",
-    "desc": "",
+    "desc": "固定左侧菜单",
     "defaultEnabled": true
   },
   {
@@ -49,5 +49,11 @@
     "name": "copyNamespace",
     "desc": "复制namespace",
     "defaultEnabled": true
+  },
+  {
+    "name": "prodWarnDisable",
+    "desc": "谨慎使用",
+    "defaultEnabled": false,
+    "enabledWarn": "实验性功能,请谨慎操作"
   }
 ]

@@ -30,7 +30,7 @@ loadFeature("nav", false, function () {
       }, 2000);
     });
   });
-  // 加载 layer  依赖 $
+  // 加载 layer  因为依赖 $ 所以在代码里面进行加载
   GM_addElement("script", {
     src: "https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
     type: "text/javascript",
@@ -47,6 +47,7 @@ loadFeature("nav", false, function () {
   const text_different_css = GM_getResourceText("text_different_css");
   GM_addStyle(highlight_xcode_css);
   GM_addStyle(text_different_css);
+  
 })();
 
 export function getAllFeaturenMap() {
