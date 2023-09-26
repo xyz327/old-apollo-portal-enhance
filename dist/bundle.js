@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      0.9.7
+// @version      0.9.8
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -694,14 +694,16 @@
       });
     }
     // for scroll
-    var nicesocre = $("#releaseModal").niceScroll({ cursoropacitymax: 0 });
-    $("#goReleaseMoadlBottom").on("click", function () {
-      nicesocre.doScrollTop($("#goReleaseMoadlTop").offset().top, 1000);
-    });
+    if ($().niceScroll) {
+      var nicesocre = $("#releaseModal").niceScroll({ cursoropacitymax: 0 });
+      $("#goReleaseMoadlBottom").on("click", function () {
+        nicesocre.doScrollTop($("#goReleaseMoadlTop").offset().top, 1000);
+      });
 
-    $("#goReleaseMoadlTop").on("click", function () {
-      nicesocre.doScrollTop($("#goReleaseMoadlBottom").offset().top, 1000);
-    });
+      $("#goReleaseMoadlTop").on("click", function () {
+        nicesocre.doScrollTop($("#goReleaseMoadlBottom").offset().top, 1000);
+      });
+    }
     return true;
   });
 
