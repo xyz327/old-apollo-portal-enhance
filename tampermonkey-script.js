@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.9.6
+// @version      0.9.7
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -405,7 +405,6 @@
 
   loadFeature("disableScrollOnModal", false, function () {
     var openModalCnt = 0;
-    $("html").getNiceScroll(0);
     $("body")
       .on("shown.bs.modal", function () {
         openModalCnt++;
@@ -499,7 +498,7 @@
       $("#select2-namespaceSelecter-results").css({ "max-height": "600px" });
     });
 
-    var htmlScroll = $("html").getNiceScroll(0);
+    var htmlScroll = $("html").getNiceScroll && $("html").getNiceScroll(0);
     // 修改选项时 滚动页面到对应位置
     $select.on("select2:select", function (e) {
       var namespaceId = $select.val();
@@ -507,7 +506,7 @@
       var namespaceEl = $(".namespace-name")
         .toArray()
         .find((el) => el.innerHTML == namespaceId);
-      htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
+        htmlScroll && htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
     });
 
     // 滚动页面时同步改变 当前选择的 namespace 选项
