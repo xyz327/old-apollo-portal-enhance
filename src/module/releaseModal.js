@@ -1,4 +1,4 @@
-import { loadFeature } from "./base";
+import { loadFeature } from "../base";
 
 loadFeature("releaseModal", true, function () {
   if ($("#goReleaseMoadlBottom").length == 0) {

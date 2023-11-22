@@ -1,4 +1,4 @@
-import { loadFeature,getAppId } from "./base";
+import { loadFeature,getAppId } from "../base";
 
 
 loadFeature("fixEnvTab", true, function (isReloadByHash) {

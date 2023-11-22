@@ -52,6 +52,11 @@
   		defaultEnabled: true
   	},
   	{
+  		name: "valueCodeEditor",
+  		desc: "配置值编辑器增强",
+  		defaultEnabled: false
+  	},
+  	{
   		name: "releaseModal",
   		desc: "发布界面增强",
   		defaultEnabled: true
@@ -103,6 +108,29 @@
         `);
     return true;
   });
+  function loadJs(src) {
+    return new Promise(function (resolve, reject) {
+      const gmAdd = GM_addElement("script", {
+        src,
+        type: "text/javascript"
+      });
+      if (gmAdd) {
+        gmAdd.onload = function () {
+          resolve();
+        };
+      } else {
+        resolve();
+      }
+
+    })
+
+  }
+  function loadCss(href) {
+    GM_addElement("link", {
+      href,
+      rel: "stylesheet",
+    });
+  }
   (function () {
     initFeatureId();
     initDiffModal();
@@ -117,23 +145,15 @@
       });
     });
     // 加载 layer  因为依赖 $ 所以在代码里面进行加载
-    GM_addElement("script", {
-      src: "https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
-      type: "text/javascript",
-    });
-    GM_addElement("link", {
-      href: "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
-      rel: "stylesheet",
-    });
-    GM_addElement("script", {
-      src: "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js",
-      type: "text/javascript",
-    });
+    loadJs("https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js");
+
+    loadCss("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css");
+    loadJs("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js");
     const highlight_xcode_css = GM_getResourceText("highlight_xcode_css");
     const text_different_css = GM_getResourceText("text_different_css");
     GM_addStyle(highlight_xcode_css);
     GM_addStyle(text_different_css);
-    
+
   })();
 
   function getAllFeaturenMap() {
@@ -188,9 +208,9 @@
       typeof options === "object"
         ? options
         : {
-            switch: true,
-            reloadOnHashChange: options,
-          };
+          switch: true,
+          reloadOnHashChange: options,
+        };
     if (options.switch) {
       //  allFeature.push(name);
       if (isFeatureDisabled(name)) {
@@ -261,6 +281,7 @@
       document.execCommand("Copy");
     });
   }
+
   function toPerttyJson(val) {
     try {
       return JSON.stringify(JSON.parse(val), null, 2);
@@ -338,15 +359,47 @@
       `);
   }
 
-  loadFeature("fixNiceScroll", false, function () {
-      $(document).ready(function () {
-        // 放在初始化之后执行
-        setTimeout(function () {
-          $("html").css("overflow", "");
-        }, 200);
-      });
-      return true;
+  loadFeature("copyNamespace", false, function () {
+    onNamesacpeLoaded(function () {
+      $("header.panel-heading .header-namespace>span:first-child")
+        .toArray()
+        .forEach(function (el) {
+          var name = el.innerText.trim();
+          var $el = $(el);
+          if ($el.nextAll(".copyNamespace").length != 0) {
+            return;
+          }
+          $el.next("span").after(`
+        <span data-tooltip="tooltip" title="点击复制namespace" data-copy="copy"
+         data-copy-value="${name}" class="copyNamespace label label-success">复制
+        <label class="glyphicon glyphicon-duplicate"></label>
+        </span>
+        `);
+        });
     });
+
+    return true;
+  });
+
+  loadFeature("disableScrollOnModal", false, function () {
+    var openModalCnt = 0;
+    $("body")
+      .on("shown.bs.modal", function () {
+        openModalCnt++;
+        //$("html").css("overflow", "hidden");
+        $("body").css("overflow", "hidden");
+        //htmlScroller.hide();
+      })
+      .on("hidden.bs.modal", function () {
+        openModalCnt--;
+        if (openModalCnt <= 0) {
+          //$("html").css("overflow", "");
+          $("body").css("overflow", "");
+         // htmlScroller.show();
+        }
+      });
+    return true;
+  });
 
   loadFeature("fixEnvTab", true, function (isReloadByHash) {
       var $tab = $(".J_appFound");
@@ -403,25 +456,15 @@
       return true;
     });
 
-  loadFeature("disableScrollOnModal", false, function () {
-    var openModalCnt = 0;
-    $("body")
-      .on("shown.bs.modal", function () {
-        openModalCnt++;
-        //$("html").css("overflow", "hidden");
-        $("body").css("overflow", "hidden");
-        //htmlScroller.hide();
-      })
-      .on("hidden.bs.modal", function () {
-        openModalCnt--;
-        if (openModalCnt <= 0) {
-          //$("html").css("overflow", "");
-          $("body").css("overflow", "");
-         // htmlScroller.show();
-        }
+  loadFeature("fixNiceScroll", false, function () {
+      $(document).ready(function () {
+        // 放在初始化之后执行
+        setTimeout(function () {
+          $("html").css("overflow", "");
+        }, 200);
       });
-    return true;
-  });
+      return true;
+    });
 
   let inited = false;
   loadFeature("gotoNamespace", false, () => {
@@ -537,6 +580,62 @@
     $(".namespace-name").each((i, el) => {
       io.observe(el);
     });
+  }
+
+  loadFeature("prodWarn", false, function () {
+    prodWarn();
+  });
+
+  function prodWarn() {
+    var $releaseModal = $("#releaseModal");
+
+    $releaseModal.on("show.bs.modal", function () {
+      var namespaceScope = $(
+        'div[ng-controller="ConfigNamespaceController"]'
+      ).scope();
+      var env = namespaceScope.pageContext.env;
+      if (!isProd$1(env)){
+          return;
+      }
+      layer.open({
+          shadeClose: true,
+          content: `你正在操作<font color="red">${env}</font>环境!<br/>正确则可以忽略本消息`,
+          icon:0,
+          btn: ['关闭']
+      });
+    });
+  }
+  function isProd$1(env){
+      return env && env === 'PRO'
+  }
+
+  loadFeature("prodWarnDisable", false, function () {
+    prodWarnDisable();
+  });
+
+  function prodWarnDisable() {
+
+    var $btn = $("#releaseModal div.modal-footer").find("button[type=submit]");
+    $btn.click(function (e) {
+      var namespaceScope = $(
+        'div[ng-controller="ConfigNamespaceController"]'
+      ).scope();
+      var env = namespaceScope.pageContext.env;
+      if (!isProd(env)){
+          return;
+      }
+      if (!isProd(env)) {
+        return;
+      }
+      if (!isFeatureDisabled("prodWarnDisable")) {
+        if (confirm("已关闭生产环境发布校验，是否继续？")) {
+          namespaceScope.$root.userName = "disabledProdWarn";
+        }
+      }
+    });
+  }
+  function isProd(env) {
+    return env && env === "PRO";
   }
 
   var DiffMatch = new diff_match_patch();
@@ -706,6 +805,105 @@
     }
     return true;
   });
+
+  loadFeature(
+    "settings",
+    { switch: false, reloadOnHashChange: false },
+    function () {
+      buildSettings();
+    }
+  );
+  function buildSettings() {
+    initSettingsModal();
+    $("[data-toggle=switch]")
+      .bootstrapSwitch({
+        onText: "开启",
+        offText: "关闭",
+        onSwitchChange: function (event, state) {
+          console.log(arguments);
+          if (!state) {
+            return;
+          }
+          var $el = $(this);
+          var featureName = $el.val();
+          var feature = getAllFeaturenMap()[featureName];
+          if (
+            feature &&
+            !featureTypeState(featureName, "enabledWarn") &&
+            feature.enabledWarn
+          ) {
+            layer.confirm(
+              feature.enabledWarn,
+              { icon: 3, btn: ["确定", "取消"] },
+              function (index) {
+                featureTypeState(featureName, "enabledWarn", true);
+                $el.bootstrapSwitch("state", true);
+                layer.close(index);
+              },
+              function () {}
+            );
+            return false;
+          }
+        },
+      })
+      .on("switchChange.bootstrapSwitch", function (event, state) {
+        var featureName = $(this).val();
+        switchFeature(featureName, state);
+        console.log(state);
+        if (!state) {
+          featureTypeState(featureName, "enabledWarn", false);
+        }
+      });
+
+    appendNavBar(`
+  <li>
+  <a href="javascript:void(0);" id="showSettings">
+  <span class="glyphicon glyphicon-cog"></span>
+  </a>
+  </li>
+  `);
+    $("#showSettings").on("click", showSettings);
+  }
+
+  function showSettings() {
+    $("#settingsModal").modal();
+  }
+
+  function initSettingsModal() {
+    var tpl = "";
+    allFeature.forEach((feature) => {
+      var key = feature.name.replace(".", "-");
+      var checked = isFeatureDisabled(feature.name) ? "" : "checked";
+      tpl += `
+        <div class="form-group" style="width:45%;margin:5px 0px;">
+            <label class="col-sm-6 control-label" for="feature-switch-${key}">${feature.name}
+            <span class="glyphicon glyphicon-question-sign" data-tooltip="tooltip" title="${feature.desc}"></span>
+            </label>
+            <div class="col-sm-6">
+            <input type="checkbox" data-toggle="switch" value="${feature.name}" id="feature-switch-${key}" ${checked}/>
+            </div>
+        </div>    
+        `;
+    });
+    $("body").append(`
+        <!-- Modal -->
+        <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效)</h4>
+              </div>
+              <div class="modal-body" >
+              <form class="form-inline">
+              ${tpl}
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        `);
+  }
 
   loadFeature("showText", true, function () {
     var $namespaces = $(".namespace-view-table");
@@ -976,182 +1174,104 @@
           </table>`;
   }
 
-  loadFeature("prodWarn", false, function () {
-    prodWarn();
-  });
+  const DateType = {
+      isJson(val) {
+          try {
+              JSON.parse(val);
+              return true
+          } catch (e) {
+              return false
+          }
 
-  function prodWarn() {
-    var $releaseModal = $("#releaseModal");
-
-    $releaseModal.on("show.bs.modal", function () {
-      var namespaceScope = $(
-        'div[ng-controller="ConfigNamespaceController"]'
-      ).scope();
-      var env = namespaceScope.pageContext.env;
-      if (!isProd$1(env)){
-          return;
       }
-      layer.open({
-          shadeClose: true,
-          content: `你正在操作<font color="red">${env}</font>环境!<br/>正确则可以忽略本消息`,
-          icon:0,
-          btn: ['关闭']
+  };
+
+  const modules = {
+      core: {
+          js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/codemirror.min.js",
+          css: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/codemirror.min.css"
+      },
+      json: {
+          alias: "javascript",
+          mode: "application/json"
+      },
+      javascript: {
+          js: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/mode/javascript/javascript.min.js",
+          mode: "application/javascript"
+      }
+  };
+  loadJs(modules.core.js);
+  loadCss(modules.core.css);
+  const cm = {
+      detectMode(val) {
+          let mode;
+          if (DateType.isJson(val)) {
+              mode = 'json';
+          }
+          const modeO = this.getModeO(mode);
+          if (!modeO) {
+              return Promise.resolve()
+          }
+          const alias = modeO.alias;
+          let needLoadMode = modeO;
+          if (alias) {
+              needLoadMode = modules[alias];
+          }
+          return this.loadMode(needLoadMode).then(() => modeO?.mode)
+
+      },
+      getModeO(mode) {
+          if (!mode) {
+              return
+          }
+          let modeO = modules[mode];
+          if (!modeO) {
+              console.error(`不支持的mode:${mode}`);
+              return;
+          }
+          return modeO;
+      },
+      loadMode(modeO) {
+          if (modeO.loaded) {
+              return Promise.resolve(modeO);
+          }
+          modeO.css && loadCss(modeO.css);
+          modeO.loaded = true;
+          return loadJs(modeO.js).then(() => modeO)
+      }
+  };
+
+  loadFeature("valueCodeEditor", false, function () {
+      let cmObj;
+      $("#itemModal")
+          .on("shown.bs.modal", function () {
+              const $textarea = $('#itemModal textarea[name=value]');
+              cm.detectMode($textarea.val())
+                  .then(mode => {
+                      console.log(mode);
+                      cmObj = CodeMirror.fromTextArea($textarea[0], {
+                          lineNumbers: true,
+                          mode: mode
+                      });
+                  });
+              //$("html").css("overflow", "hidden");
+
+
+              //htmlScroller.hide();
+          })
+          .on("hidden.bs.modal", function () {
+              cmObj && cmObj.toTextArea();
+              console.log(cmObj);
+          });
+      var $btn = $("#itemModal div.modal-footer").find("button[type=submit]");
+      $btn.click(function (e) {
+          if (cmObj) {
+              cmObj.save();
+              $(cmObj.getTextArea()).trigger('change'); // 触发angular.js 
+          }
       });
-    });
-  }
-  function isProd$1(env){
-      return env && env === 'PRO'
-  }
 
-  loadFeature(
-    "settings",
-    { switch: false, reloadOnHashChange: false },
-    function () {
-      buildSettings();
-    }
-  );
-  function buildSettings() {
-    initSettingsModal();
-    $("[data-toggle=switch]")
-      .bootstrapSwitch({
-        onText: "开启",
-        offText: "关闭",
-        onSwitchChange: function (event, state) {
-          console.log(arguments);
-          if (!state) {
-            return;
-          }
-          var $el = $(this);
-          var featureName = $el.val();
-          var feature = getAllFeaturenMap()[featureName];
-          if (
-            feature &&
-            !featureTypeState(featureName, "enabledWarn") &&
-            feature.enabledWarn
-          ) {
-            layer.confirm(
-              feature.enabledWarn,
-              { icon: 3, btn: ["确定", "取消"] },
-              function (index) {
-                featureTypeState(featureName, "enabledWarn", true);
-                $el.bootstrapSwitch("state", true);
-                layer.close(index);
-              },
-              function () {}
-            );
-            return false;
-          }
-        },
-      })
-      .on("switchChange.bootstrapSwitch", function (event, state) {
-        var featureName = $(this).val();
-        switchFeature(featureName, state);
-        console.log(state);
-        if (!state) {
-          featureTypeState(featureName, "enabledWarn", false);
-        }
-      });
-
-    appendNavBar(`
-  <li>
-  <a href="javascript:void(0);" id="showSettings">
-  <span class="glyphicon glyphicon-cog"></span>
-  </a>
-  </li>
-  `);
-    $("#showSettings").on("click", showSettings);
-  }
-
-  function showSettings() {
-    $("#settingsModal").modal();
-  }
-
-  function initSettingsModal() {
-    var tpl = "";
-    allFeature.forEach((feature) => {
-      var key = feature.name.replace(".", "-");
-      var checked = isFeatureDisabled(feature.name) ? "" : "checked";
-      tpl += `
-        <div class="form-group" style="width:45%;margin:5px 0px;">
-            <label class="col-sm-6 control-label" for="feature-switch-${key}">${feature.name}
-            <span class="glyphicon glyphicon-question-sign" data-tooltip="tooltip" title="${feature.desc}"></span>
-            </label>
-            <div class="col-sm-6">
-            <input type="checkbox" data-toggle="switch" value="${feature.name}" id="feature-switch-${key}" ${checked}/>
-            </div>
-        </div>    
-        `;
-    });
-    $("body").append(`
-        <!-- Modal -->
-        <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效)</h4>
-              </div>
-              <div class="modal-body" >
-              <form class="form-inline">
-              ${tpl}
-              </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        `);
-  }
-
-  loadFeature("copyNamespace", false, function () {
-    onNamesacpeLoaded(function () {
-      $("header.panel-heading .header-namespace>span:first-child")
-        .toArray()
-        .forEach(function (el) {
-          var name = el.innerText.trim();
-          var $el = $(el);
-          if ($el.nextAll(".copyNamespace").length != 0) {
-            return;
-          }
-          $el.next("span").after(`
-        <span data-tooltip="tooltip" title="点击复制namespace" data-copy="copy"
-         data-copy-value="${name}" class="copyNamespace label label-success">复制
-        <label class="glyphicon glyphicon-duplicate"></label>
-        </span>
-        `);
-        });
-    });
-
-    return true;
   });
-
-  loadFeature("prodWarnDisable", false, function () {
-    prodWarnDisable();
-  });
-
-  function prodWarnDisable() {
-
-    var $btn = $("#releaseModal div.modal-footer").find("button[type=submit]");
-    $btn.click(function (e) {
-      var namespaceScope = $(
-        'div[ng-controller="ConfigNamespaceController"]'
-      ).scope();
-      var env = namespaceScope.pageContext.env;
-      if (!isProd(env)){
-          return;
-      }
-      if (!isProd(env)) {
-        return;
-      }
-      if (!isFeatureDisabled("prodWarnDisable")) {
-        if (confirm("已关闭生产环境发布校验，是否继续？")) {
-          namespaceScope.$root.userName = "disabledProdWarn";
-        }
-      }
-    });
-  }
-  function isProd(env) {
-    return env && env === "PRO";
-  }
 
   loadFeature("main", { switch: false }, function () {
     $("body").trigger("featureLoaded");

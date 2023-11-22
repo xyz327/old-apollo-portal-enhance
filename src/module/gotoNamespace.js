@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { loadFeature, appendNavBar, onNamesacpeLoaded } from "./base";
+import { loadFeature, appendNavBar, onNamesacpeLoaded } from "../base";
 
 let inited = false;
 loadFeature("gotoNamespace", false, () => {

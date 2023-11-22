@@ -1,4 +1,4 @@
-import { loadFeature, showDiffModal } from "./base";
+import { loadFeature, showDiffModal } from "../base";
 
 loadFeature("showText", true, function () {
   var $namespaces = $(".namespace-view-table");

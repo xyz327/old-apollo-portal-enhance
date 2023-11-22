@@ -1,19 +1,18 @@
 import { loadFeature } from "./base";
-import "./fixNiceScroll";
-import "./fixEnvTab";
-import "./disableScrollOnModal";
-import "./gotoNamespace";
-import "./releaseDiff";
-import "./releaseModal";
-import "./showText";
-
-import "./stash";
-import "./help";
-import "./prodWarn";
-import "./settings";
-import "./copyNamespace";
-import "./prodWarnDisabled";
-
+import './module/copyNamespace.js'
+import './module/disableScrollOnModal.js'
+import './module/fixEnvTab.js'
+import './module/fixNiceScroll.js'
+import './module/gotoNamespace.js'
+import './module/help.js'
+import './module/prodWarn.js'
+import './module/prodWarnDisabled.js'
+import './module/releaseDiff.js'
+import './module/releaseModal.js'
+import './module/settings.js'
+import './module/showText.js'
+import './module/stash.js'
+import './module/valueCodeEditor.js'
 loadFeature("main", { switch: false }, function () {
   $("body").trigger("featureLoaded");
   console.log("trigger featureLoaded");

@@ -1,4 +1,4 @@
-import { loadFeature, isFeatureDisabled } from "./base";
+import { loadFeature, isFeatureDisabled } from "../base";
 
 loadFeature("prodWarnDisable", false, function () {
   prodWarnDisable();

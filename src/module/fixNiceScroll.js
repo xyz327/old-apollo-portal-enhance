@@ -1,4 +1,4 @@
-import { loadFeature } from "./base";
+import { loadFeature } from "../base";
 
 loadFeature("fixNiceScroll", false, function () {
     $(document).ready(function () {

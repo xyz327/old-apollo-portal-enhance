@@ -6,8 +6,8 @@ import {
   getAllFeaturenMap,
   featureState,
   featureTypeState,
-} from "./base";
-import allFeature from "./allFeature.json";
+} from "../base";
+import allFeature from "../allFeature.json";
 
 loadFeature(
   "settings",

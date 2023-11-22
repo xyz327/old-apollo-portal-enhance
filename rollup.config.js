@@ -4,13 +4,24 @@ import { string } from "rollup-plugin-string";
 import json from "@rollup/plugin-json";
 
 import * as fs from "fs";
+import path from "path";
+
+const allModuleImport = fs.readdirSync('./src/module')
+  .filter(file => path.extname(file) === '.js') // 只包含 .js 文件
+  .map(file => `import './module/${file}'`)
+  .join("\n");
+
+fs.writeFileSync("./src/main.js", _.template(fs.readFileSync("./src/main.template.js", { "encoding": "utf-8" }), {
+  // mustache style
+  interpolate: /{{([\s\S]+?)}}/g,
+})({ allModuleImport }))
 import pkg from "./package.json";
 import _ from "lodash";
 export default {
   input: "./src/main.js", //入口文件
   output: [
     {
-      banner: getBanner({destFile:"tampermonkey-script.js"}),
+      banner: getBanner({ destFile: "tampermonkey-script.js" }),
       file: "./tampermonkey-script.js", //打包后的存放文件
       format: "iife", //输出格式 amd es6 iife umd cjs
       name: "bundleName", //如果iife,umd需要指定一个全局变量
@@ -21,7 +32,7 @@ export default {
       },
     },
     {
-      banner: getBanner({ name: "apollo-enhance-v2", destFile:"dist/bundle.js" }),
+      banner: getBanner({ name: "apollo-enhance-v2", destFile: "dist/bundle.js" }),
       file: "./dist/bundle.js", //打包后的存放文件
       format: "iife", //输出格式 amd es6 iife umd cjs
       name: "bundleName", //如果iife,umd需要指定一个全局变量

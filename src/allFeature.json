@@ -25,6 +25,11 @@
     "defaultEnabled": true
   },
   {
+    "name": "valueCodeEditor",
+    "desc": "配置值编辑器增强",
+    "defaultEnabled": false
+  },
+  {
     "name": "releaseModal",
     "desc": "发布界面增强",
     "defaultEnabled": true
