@@ -23,8 +23,8 @@
 
 ### 从 greasyfork 安装
 
- 1. 浏览器访问 [https://greasyfork.org/zh-CN/scripts/455123-apollo-enhance-v2](https://greasyfork.org/zh-CN/scripts/455123-apollo-enhance-v2)
- <!-- 1. 浏览器访问 [https://greasyfork.org/zh-CN/scripts/447045-apollo-enhance](https://greasyfork.org/zh-CN/scripts/447045-apollo-enhance)-->
+ <!-- 1. 浏览器访问 [https://greasyfork.org/zh-CN/scripts/455123-apollo-enhance-v2](https://greasyfork.org/zh-CN/scripts/455123-apollo-enhance-v2) -->
+ 1. 浏览器访问 [https://greasyfork.org/zh-CN/scripts/447045-apollo-enhance](https://greasyfork.org/zh-CN/scripts/447045-apollo-enhance)
  2. 点击安装
 
 ### 从 github 安装
