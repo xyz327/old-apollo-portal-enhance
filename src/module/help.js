@@ -1,4 +1,4 @@
-// import { loadFeature, appendNavBar } from "./base";
+// import { loadFeature, appendNavBar } from "../base";
 
 // loadFeature("help", false, function () {
 //      helpInfo();

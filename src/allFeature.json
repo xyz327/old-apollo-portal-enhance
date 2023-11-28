@@ -1,10 +1,5 @@
 [
   {
-    "name": "disableScrollOnModal",
-    "desc": "",
-    "defaultEnabled": true
-  },
-  {
     "name": "fixEnvTab",
     "desc": "固定左侧菜单",
     "defaultEnabled": true
@@ -41,11 +36,6 @@
     "enabledWarn": "实验性功能,请谨慎操作"
   },
   {
-    "name": "prodWarn",
-    "desc": "操作线上环境提示",
-    "defaultEnabled": false
-  },
-  {
     "name": "copyNamespace",
     "desc": "复制namespace",
     "defaultEnabled": true
@@ -55,5 +45,10 @@
     "desc": "谨慎使用",
     "defaultEnabled": false,
     "enabledWarn": "实验性功能,请谨慎操作"
+  },
+  {
+    "name": "valueCodeEditor",
+    "desc": "配置值编辑器增强",
+    "defaultEnabled": false
   }
 ]

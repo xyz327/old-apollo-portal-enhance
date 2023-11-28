@@ -1,4 +1,4 @@
-import { loadFeature, onNamesacpeLoaded } from "./base";
+import { loadFeature, onNamesacpeLoaded } from "../base";
 loadFeature("stash", true, function () {
   onNamesacpeLoaded(function () {
     console.log("stash");

@@ -6,8 +6,8 @@ import {
   getAllFeaturenMap,
   featureState,
   featureTypeState,
-} from "./base";
-import allFeature from "./allFeature.json";
+} from "../base";
+import allFeature from "../allFeature.json";
 
 loadFeature(
   "settings",
@@ -23,15 +23,12 @@ function buildSettings() {
       onText: "开启",
       offText: "关闭",
       onSwitchChange: function (event, state) {
-        console.log(arguments);
-        if (!state) {
-          return;
-        }
         var $el = $(this);
         var featureName = $el.val();
         var feature = getAllFeaturenMap()[featureName];
         if (
           feature &&
+          state &&
           !featureTypeState(featureName, "enabledWarn") &&
           feature.enabledWarn
         ) {
@@ -39,23 +36,24 @@ function buildSettings() {
             feature.enabledWarn,
             { icon: 3, btn: ["确定", "取消"] },
             function (index) {
+              switchFeature(featureName, true);
               featureTypeState(featureName, "enabledWarn", true);
               $el.bootstrapSwitch("state", true);
               layer.close(index);
+              layer.confirm('切换成功,刷新生效。是否立即刷新页面?', function (idx) {
+                location.reload()
+              })
             },
-            function () {}
+            function () { }
           );
           return false;
+        } else {
+          switchFeature(featureName, state);
+          layer.confirm('切换成功,刷新生效。是否立即刷新页面?', function (idx) {
+            location.reload()
+          })
         }
       },
-    })
-    .on("switchChange.bootstrapSwitch", function (event, state) {
-      var featureName = $(this).val();
-      switchFeature(featureName, state);
-      console.log(state);
-      if (!state) {
-        featureTypeState(featureName, "enabledWarn", false);
-      }
     });
 
   appendNavBar(`
@@ -101,6 +99,11 @@ function initSettingsModal() {
               <form class="form-inline">
               ${tpl}
               </form>
+              </div>
+              <div class="modal-footer">
+                <div class="center-block">
+                  反馈👉 企微<a href="javascript:void(0);">@xizhouxi</a>
+                </div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { loadFeature, onNamesacpeLoaded } from "./base";
+import { loadFeature, onNamesacpeLoaded } from "../base";
 
 loadFeature("copyNamespace", false, function () {
   onNamesacpeLoaded(function () {

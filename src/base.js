@@ -17,6 +17,29 @@ loadFeature("nav", false, function () {
         `);
   return true;
 });
+export function loadJs(src) {
+  return new Promise(function (resolve, reject) {
+    const gmAdd = GM_addElement("script", {
+      src,
+      type: "text/javascript"
+    });
+    if (gmAdd) {
+      gmAdd.onload = function () {
+        resolve()
+      }
+    } else {
+      resolve()
+    }
+
+  })
+
+}
+export function loadCss(href) {
+  GM_addElement("link", {
+    href,
+    rel: "stylesheet",
+  });
+}
 (function () {
   initFeatureId();
   initDiffModal();
@@ -31,23 +54,15 @@ loadFeature("nav", false, function () {
     });
   });
   // 加载 layer  因为依赖 $ 所以在代码里面进行加载
-  GM_addElement("script", {
-    src: "https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
-    type: "text/javascript",
-  });
-  GM_addElement("link", {
-    href: "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
-    rel: "stylesheet",
-  });
-  GM_addElement("script", {
-    src: "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js",
-    type: "text/javascript",
-  });
+  loadJs("https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js");
+
+  loadCss("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css");
+  loadJs("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js");
   const highlight_xcode_css = GM_getResourceText("highlight_xcode_css");
   const text_different_css = GM_getResourceText("text_different_css");
   GM_addStyle(highlight_xcode_css);
   GM_addStyle(text_different_css);
-  
+
 })();
 
 export function getAllFeaturenMap() {
@@ -102,9 +117,9 @@ export function loadFeature(name, options, feature) {
     typeof options === "object"
       ? options
       : {
-          switch: true,
-          reloadOnHashChange: options,
-        };
+        switch: true,
+        reloadOnHashChange: options,
+      };
   if (options.switch) {
     //  allFeature.push(name);
     if (isFeatureDisabled(name)) {
@@ -175,6 +190,7 @@ export function copy(content) {
     document.execCommand("Copy");
   });
 }
+
 function toPerttyJson(val) {
   try {
     return JSON.stringify(JSON.parse(val), null, 2);

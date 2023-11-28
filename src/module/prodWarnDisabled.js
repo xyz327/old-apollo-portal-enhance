@@ -1,4 +1,4 @@
-import { loadFeature, isFeatureDisabled } from "./base";
+import { loadFeature, isFeatureDisabled } from "../base";
 
 loadFeature("prodWarnDisable", false, function () {
   prodWarnDisable();
@@ -12,19 +12,22 @@ function prodWarnDisable() {
       'div[ng-controller="ConfigNamespaceController"]'
     ).scope();
     var env = namespaceScope.pageContext.env;
-    if (!isProd(env)){
-        return;
-    }
     if (!isProd(env)) {
       return;
     }
+    var my = namespaceScope.$root.userName
+    var toReleaseNamespace = $(releaseForm).isolateScope()?.toReleaseNamespace;
+    var selfModify = true;
+    if (toReleaseNamespace) {
+      selfModify = toReleaseNamespace.items.filter(item => item.isModified).find(item => item.item.dataChangeLastModifiedBy === my)
+    }
     if (!isFeatureDisabled("prodWarnDisable")) {
-      if (confirm("已关闭生产环境发布校验，是否继续？")) {
+      if (selfModify && confirm("已关闭生产环境发布校验，是否继续？")) {
         namespaceScope.$root.userName = "disabledProdWarn";
       }
     }
   });
 }
 function isProd(env) {
-  return env && env === "PRO";
+  return true;// env && env === "PRO";
 }

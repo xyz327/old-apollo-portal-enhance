@@ -1,5 +1,6 @@
 import _ from "lodash";
-import { loadFeature, appendNavBar, onNamesacpeLoaded } from "./base";
+import { loadFeature, appendNavBar, onNamesacpeLoaded } from "../base";
+import { scrollTo } from "../common/scroller";
 
 let inited = false;
 loadFeature("gotoNamespace", false, () => {
@@ -76,7 +77,7 @@ function buildGotoNamespace() {
     $("#select2-namespaceSelecter-results").css({ "max-height": "600px" });
   });
 
-  var htmlScroll = $("html").getNiceScroll && $("html").getNiceScroll(0);
+  //var htmlScroll = $("html").getNiceScroll && $("html").getNiceScroll(0);
   // 修改选项时 滚动页面到对应位置
   $select.on("select2:select", function (e) {
     var namespaceId = $select.val();
@@ -84,7 +85,8 @@ function buildGotoNamespace() {
     var namespaceEl = $(".namespace-name")
       .toArray()
       .find((el) => el.innerHTML == namespaceId);
-      htmlScroll && htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
+      scrollTo(namespaceEl)
+//      htmlScroll && htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
   });
 
   // 滚动页面时同步改变 当前选择的 namespace 选项

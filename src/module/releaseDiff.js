@@ -1,4 +1,4 @@
-import { loadFeature,showDiffModal } from "./base";
+import { loadFeature,showDiffModal } from "../base";
 
 var DiffMatch = new diff_match_patch();
 
