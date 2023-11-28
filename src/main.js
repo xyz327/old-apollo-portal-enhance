@@ -1,11 +1,9 @@
 import { loadFeature } from "./base";
 import './module/copyNamespace.js'
-import './module/disableScrollOnModal.js'
 import './module/fixEnvTab.js'
 import './module/fixNiceScroll.js'
 import './module/gotoNamespace.js'
 import './module/help.js'
-import './module/prodWarn.js'
 import './module/prodWarnDisabled.js'
 import './module/releaseDiff.js'
 import './module/releaseModal.js'
