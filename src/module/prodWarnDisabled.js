@@ -29,5 +29,5 @@ function prodWarnDisable() {
   });
 }
 function isProd(env) {
-  return true;// env && env === "PRO";
+  return  env && env === "PRO";
 }
