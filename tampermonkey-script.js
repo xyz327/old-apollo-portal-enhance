@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.9.10
+// @version      0.9.11
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -574,7 +574,10 @@
       var namespaceScope = $(
         'div[ng-controller="ConfigNamespaceController"]'
       ).scope();
-      namespaceScope.pageContext.env;
+      var env = namespaceScope.pageContext.env;
+      if (!isProd(env)) {
+        return;
+      }
       var my = namespaceScope.$root.userName;
       var toReleaseNamespace = $(releaseForm).isolateScope()?.toReleaseNamespace;
       var selfModify = true;
@@ -587,6 +590,9 @@
         }
       }
     });
+  }
+  function isProd(env) {
+    return  env && env === "PRO";
   }
 
   var DiffMatch = new diff_match_patch();
@@ -837,7 +843,7 @@
               </div>
               <div class="modal-footer">
                 <div class="center-block">
-                  反馈👉 <a href="javascript:void(0);">@xizhouxi</a>
+                  反馈👉 企微<a href="javascript:void(0);">@xizhouxi</a>
                 </div>
               </div>
             </div>
