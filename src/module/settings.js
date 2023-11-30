@@ -102,7 +102,7 @@ function initSettingsModal() {
               </div>
               <div class="modal-footer">
                 <div class="center-block">
-                  反馈👉 企微<a href="javascript:void(0);">@xizhouxi</a>
+                  反馈👉 企微<a href="wxwork://message?username=xizhouxi">@xizhouxi</a>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      0.9.11
+// @version      0.9.12
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -843,7 +843,7 @@
               </div>
               <div class="modal-footer">
                 <div class="center-block">
-                  反馈👉 企微<a href="javascript:void(0);">@xizhouxi</a>
+                  反馈👉 企微<a href="wxwork://message?username=xizhouxi">@xizhouxi</a>
                 </div>
               </div>
             </div>
