@@ -3,8 +3,9 @@ import {
   appendNavBar,
   isFeatureDisabled,
   switchFeature,
+  require,
   getAllFeaturenMap,
-  featureState,
+  BASE_INFO,
   featureTypeState,
 } from "../base";
 import allFeature from "../allFeature.json";
@@ -13,7 +14,10 @@ loadFeature(
   "settings",
   { switch: false, reloadOnHashChange: false },
   function () {
-    buildSettings();
+    require(["bootstrap-switch"])
+      .then(() => {
+        buildSettings();
+      })
   }
 );
 function buildSettings() {
@@ -101,9 +105,11 @@ function initSettingsModal() {
               </form>
               </div>
               <div class="modal-footer">
+                <div>${BASE_INFO.version} </div>
                 <div class="center-block">
-                  反馈👉 企微<a href="javascript:void(0);">@xizhouxi</a>
+                  企微反馈👉 <a href="wxwork://message?username=xizhouxi">@xizhouxi</a>
                 </div>
+
               </div>
             </div>
           </div>

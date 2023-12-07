@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      0.9.11
+// @version      0.9.13
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -22,7 +22,7 @@
 // @grant      GM_addElement
 // ==/UserScript==
 
-(function (_) {
+(function (_$1) {
   'use strict';
 
   var allFeature = [
@@ -86,6 +86,7 @@
   allFeature.forEach((feature) => {
     allFeatureMap[feature.name] = feature;
   });
+  const BASE_INFO = {};
   function appendNavBar(child) {
     $(`#${enhanceNavId}`).append(child);
   }
@@ -98,8 +99,24 @@
         `);
     return true;
   });
+  const loadedJs = {};
+  const srcMapping = {
+    "bootstrap-switch": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js",
+    "bootstrap-switch.css": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
+  };
+  function require(deps) {
+    deps = _.isArray(deps) ? deps : [deps];
+    return Promise.all(deps.map(dep => loadJs(dep)))
+  }
   function loadJs(src) {
-    return new Promise(function (resolve, reject) {
+    src = srcMapping[src] || src;
+    if (_.endsWith(src, '.css')) {
+      return loadCss(src)
+    }
+    if (loadedJs[src]) {
+      return loadedJs[src];
+    }
+    const loader = new Promise(function (resolve, reject) {
       const gmAdd = GM_addElement("script", {
         src,
         type: "text/javascript"
@@ -111,9 +128,9 @@
       } else {
         resolve();
       }
-
-    })
-
+    });
+    loadedJs[src] = loader;
+    return loader;
   }
   function loadCss(href) {
     GM_addElement("link", {
@@ -121,6 +138,7 @@
       rel: "stylesheet",
     });
   }
+
   (function () {
     initFeatureId();
     initDiffModal();
@@ -502,7 +520,7 @@
     return state.text;
   }
 
-  var compiled = _.template(`<% _.forEach(namespaces, function(namespace) { %>
+  var compiled = _$1.template(`<% _.forEach(namespaces, function(namespace) { %>
   <option value="<%- namespace.viewName%>"><%- namespace.viewName %></option><% 
    }); 
   %>`);
@@ -540,7 +558,7 @@
   function changeSelectedOnScroll($select) {
     var selectedVal;
     // 防抖
-    var listener = _.debounce(function (entries) {
+    var listener = _$1.debounce(function (entries) {
       if (entries.length == 0) {
         return;
       }
@@ -754,7 +772,10 @@
     "settings",
     { switch: false, reloadOnHashChange: false },
     function () {
-      buildSettings();
+      require(["bootstrap-switch"])
+        .then(() => {
+          buildSettings();
+        });
     }
   );
   function buildSettings() {
@@ -842,9 +863,11 @@
               </form>
               </div>
               <div class="modal-footer">
+                <div>${BASE_INFO.version} </div>
                 <div class="center-block">
-                  反馈👉 企微<a href="javascript:void(0);">@xizhouxi</a>
+                  企微反馈👉 <a href="wxwork://message?username=xizhouxi">@xizhouxi</a>
                 </div>
+
               </div>
             </div>
           </div>
@@ -1152,6 +1175,11 @@
           }
       },
       addon: {
+          dialog: {
+              preload: true,
+              css: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/dialog/dialog.min.css",
+              js: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/dialog/dialog.min.js"
+          },
           panel: {
               preload: true,
               js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/display/panel.min.js"
@@ -1173,6 +1201,36 @@
           "active-line": {
               preload: true,
               js: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/selection/active-line.min.js"
+          },
+          "annotatescrollbar": {
+              preload: true,
+              js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/scroll/annotatescrollbar.min.js"
+          },
+          "search": {
+              preload: true,
+              js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/search.js"
+          },
+          "searchcursor": {
+              preload: true,
+              js: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/searchcursor.min.js"
+          },
+          "matchesonscrollbar": {
+              preload: true,
+              css: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/matchesonscrollbar.min.css",
+              js: "https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/matchesonscrollbar.min.js"
+          },
+          "match-highlighter": {
+              preload: true,
+              js: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/match-highlighter.min.js"
+          },
+          "jump-to-line": {
+              preload: true,
+              js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/jump-to-line.min.js"
+          },
+          "simplescrollbars": {
+              preload: true,
+              css: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/codemirror/5.65.2/addon/scroll/simplescrollbars.css",
+              js: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"
           }
       }
   };
@@ -1205,6 +1263,7 @@
           return this._getAndloadMode(mode).then((modeO) => modeO?.mode)
       },
       init(cmObj) {
+          cmObj.setOption("scrollbarStyle", "overlay");
           const panel = cmObj.addPanel($(`
         <div style="min-height:20px" class="clearfix">
             <div class="pull-right">
@@ -1305,6 +1364,7 @@
                           styleActiveLine: true,
                           mode: mode
                       });
+                      cmObj.setSize('auto', '500px');
                       cmObj.on('changes', function () {
                           sync();
                       });
@@ -1328,9 +1388,10 @@
 
   });
 
+  BASE_INFO.version = "0.9.13";
   loadFeature("main", { switch: false }, function () {
     $("body").trigger("featureLoaded");
-    console.log("trigger featureLoaded");
+    console.log("trigger featureLoaded  v:", BASE_INFO);
   });
 
 })(_);
