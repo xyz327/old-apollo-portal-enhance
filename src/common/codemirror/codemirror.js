@@ -21,6 +21,11 @@ const cm_modules = {
         }
     },
     addon: {
+        dialog: {
+            preload: true,
+            css: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/dialog/dialog.min.css",
+            js: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/dialog/dialog.min.js"
+        },
         panel: {
             preload: true,
             js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/display/panel.min.js"
@@ -42,6 +47,36 @@ const cm_modules = {
         "active-line": {
             preload: true,
             js: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/selection/active-line.min.js"
+        },
+        "annotatescrollbar": {
+            preload: true,
+            js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/scroll/annotatescrollbar.min.js"
+        },
+        "search": {
+            preload: true,
+            js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/search.js"
+        },
+        "searchcursor": {
+            preload: true,
+            js: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/searchcursor.min.js"
+        },
+        "matchesonscrollbar": {
+            preload: true,
+            css: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/matchesonscrollbar.min.css",
+            js: "https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/matchesonscrollbar.min.js"
+        },
+        "match-highlighter": {
+            preload: true,
+            js: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/match-highlighter.min.js"
+        },
+        "jump-to-line": {
+            preload: true,
+            js: "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/codemirror/5.65.2/addon/search/jump-to-line.min.js"
+        },
+        "simplescrollbars": {
+            preload: true,
+            css: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/codemirror/5.65.2/addon/scroll/simplescrollbars.css",
+            js: "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"
         }
     }
 };
@@ -74,6 +109,7 @@ export var cm = {
         return this._getAndloadMode(mode).then((modeO) => modeO?.mode)
     },
     init(cmObj) {
+        cmObj.setOption("scrollbarStyle", "overlay")
         const panel = cmObj.addPanel($(`
         <div style="min-height:20px" class="clearfix">
             <div class="pull-right">

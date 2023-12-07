@@ -22,6 +22,7 @@ loadFeature("valueCodeEditor", false, function () {
                         styleActiveLine: true,
                         mode: mode
                     })
+                    cmObj.setSize('auto', '500px')
                     cmObj.on('changes', function () {
                         sync()
                     })

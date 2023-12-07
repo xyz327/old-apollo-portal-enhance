@@ -5,6 +5,7 @@ var allFeatureMap = {};
 allFeature.forEach((feature) => {
   allFeatureMap[feature.name] = feature;
 });
+export const BASE_INFO = {}
 export function appendNavBar(child) {
   $(`#${enhanceNavId}`).append(child);
 }
@@ -17,8 +18,24 @@ loadFeature("nav", false, function () {
         `);
   return true;
 });
+const loadedJs = {}
+const srcMapping = {
+  "bootstrap-switch": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js",
+  "bootstrap-switch.css": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
+};
+export function require(deps) {
+  deps = _.isArray(deps) ? deps : [deps]
+  return Promise.all(deps.map(dep => loadJs(dep)))
+}
 export function loadJs(src) {
-  return new Promise(function (resolve, reject) {
+  src = srcMapping[src] || src;
+  if (_.endsWith(src, '.css')) {
+    return loadCss(src)
+  }
+  if (loadedJs[src]) {
+    return loadedJs[src];
+  }
+  const loader = new Promise(function (resolve, reject) {
     const gmAdd = GM_addElement("script", {
       src,
       type: "text/javascript"
@@ -30,9 +47,9 @@ export function loadJs(src) {
     } else {
       resolve()
     }
-
   })
-
+  loadedJs[src] = loader;
+  return loader;
 }
 export function loadCss(href) {
   GM_addElement("link", {
@@ -40,6 +57,7 @@ export function loadCss(href) {
     rel: "stylesheet",
   });
 }
+
 (function () {
   initFeatureId();
   initDiffModal();

@@ -5,18 +5,20 @@ import json from "@rollup/plugin-json";
 
 import * as fs from "fs";
 import path from "path";
+import pkg from "./package.json";
+import _ from "lodash";
 
 const allModuleImport = fs.readdirSync('./src/module')
   .filter(file => path.extname(file) === '.js') // 只包含 .js 文件
   .map(file => `import './module/${file}'`)
   .join("\n");
 
-fs.writeFileSync("./src/main.js", _.template(fs.readFileSync("./src/main.template.js", { "encoding": "utf-8" }), {
+fs.writeFileSync("./src/main.js", _.template(fs.readFileSync("./src/main.template.js.hbs", { "encoding": "utf-8" }), {
   // mustache style
   interpolate: /{{([\s\S]+?)}}/g,
-})({ allModuleImport }))
-import pkg from "./package.json";
-import _ from "lodash";
+})(_.extend(pkg, { allModuleImport })))
+
+
 export default {
   input: "./src/main.js", //入口文件
   output: [

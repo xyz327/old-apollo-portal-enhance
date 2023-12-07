@@ -1,0 +1,9 @@
+
+
+import { loadFeature, BASE_INFO } from "./base";
+{{ allModuleImport }}
+BASE_INFO.version = "{{version}}";
+loadFeature("main", { switch: false }, function () {
+  $("body").trigger("featureLoaded");
+  console.log("trigger featureLoaded  v:", BASE_INFO);
+});
