@@ -76,10 +76,11 @@ function showSettings() {
 
 function initSettingsModal() {
   var tpl = "";
+  var moreTpl = "";
   allFeature.forEach((feature) => {
     var key = feature.name.replace(".", "-");
     var checked = isFeatureDisabled(feature.name) ? "" : "checked";
-    tpl += `
+    var _tpl = `
         <div class="form-group" style="width:45%;margin:5px 0px;">
             <label class="col-sm-6 control-label" for="feature-switch-${key}">${feature.name}
             <span class="glyphicon glyphicon-question-sign" data-tooltip="tooltip" title="${feature.desc}"></span>
@@ -89,6 +90,11 @@ function initSettingsModal() {
             </div>
         </div>    
         `;
+    if (feature.more) {
+      moreTpl += _tpl
+    } else {
+      tpl += _tpl
+    }
   });
   $("body").append(`
         <!-- Modal -->
@@ -103,9 +109,28 @@ function initSettingsModal() {
               <form class="form-inline">
               ${tpl}
               </form>
+              <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+              <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                  <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" 
+                    onclick="$('#collapseOne').collapse('toggle');" aria-controls="collapseOne">
+                      更多功能
+                    </a>
+                  </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="headingOne">
+                  <div class="panel-body">
+                  <form class="form-inline">
+                  ${moreTpl}
+                  </form>
+                  </div>
+                </div>
+              </div>
+            </div>
               </div>
               <div class="modal-footer">
-                <div>${BASE_INFO.version} </div>
+                <div><a href="https://greasyfork.org/zh-CN/scripts/447045-apollo-enhance" target="_blank" title="更新检测">${BASE_INFO.version}</a> </div>
                 <div class="center-block">
                   企微反馈👉 <a href="wxwork://message?username=xizhouxi">@xizhouxi</a>
                 </div>
