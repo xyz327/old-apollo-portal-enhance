@@ -15,14 +15,14 @@ function prodWarnDisable() {
     if (!isProd(env)) {
       return;
     }
-    var my = namespaceScope.$root.userName
-    var toReleaseNamespace = $(releaseForm).isolateScope()?.toReleaseNamespace;
-    var selfModify = true;
-    if (toReleaseNamespace) {
-      selfModify = toReleaseNamespace.items.filter(item => item.isModified).find(item => item.item.dataChangeLastModifiedBy === my)
-    }
+    // var my = namespaceScope.$root.userName
+    // var toReleaseNamespace = $(releaseForm).isolateScope()?.toReleaseNamespace;
+    // var selfModify = true;
+    // if (toReleaseNamespace) {
+    //   selfModify = toReleaseNamespace.items.filter(item => item.isModified).find(item => item.item.dataChangeLastModifiedBy === my)
+    // }
     if (!isFeatureDisabled("prodWarnDisable")) {
-      if (selfModify && confirm("已关闭生产环境发布校验，是否继续？")) {
+      if (confirm("已关闭生产环境发布校验，是否继续？")) {
         namespaceScope.$root.userName = "disabledProdWarn";
       }
     }

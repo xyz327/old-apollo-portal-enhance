@@ -31,6 +31,7 @@
   },
   {
     "name": "stash",
+    "more": true,
     "desc": "",
     "defaultEnabled": false,
     "enabledWarn": "实验性功能,请谨慎操作"
@@ -43,6 +44,7 @@
   {
     "name": "prodWarnDisable",
     "desc": "谨慎使用",
+    "more": true,
     "defaultEnabled": false,
     "enabledWarn": "实验性功能,请谨慎操作"
   },
