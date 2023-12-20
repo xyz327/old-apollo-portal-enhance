@@ -103,7 +103,12 @@ function initSettingsModal() {
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效)</h4>
+                <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效) 
+                <a href="javascript:void(0);" id="showFeatureInfo">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
+                </h4>
+              
               </div>
               <div class="modal-body" >
               <form class="form-inline">

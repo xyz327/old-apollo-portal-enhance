@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.9.15
+// @version      0.9.16
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -549,7 +549,6 @@
     // 修改选项时 滚动页面到对应位置
     $select.on("select2:select", function (e) {
       var namespaceId = $select.val();
-      console.log("select2:select", e, namespaceId);
       var namespaceEl = $(".namespace-name")
         .toArray()
         .find((el) => el.innerHTML == namespaceId);
@@ -867,7 +866,12 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效)</h4>
+                <h4 class="modal-title"><span class="text-danger" id="diff-detail-title"></span> 设置 (修改后刷新生效) 
+                <a href="javascript:void(0);" id="showFeatureInfo">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
+                </h4>
+              
               </div>
               <div class="modal-body" >
               <form class="form-inline">
@@ -1419,7 +1423,7 @@
 
   });
 
-  BASE_INFO.version = "0.9.15";
+  BASE_INFO.version = "0.9.16";
   loadFeature("main", { switch: false }, function () {
     $("body").trigger("featureLoaded");
     console.log("trigger featureLoaded  v:", BASE_INFO);
