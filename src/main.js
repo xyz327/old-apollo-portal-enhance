@@ -13,7 +13,7 @@ import './module/settings.js'
 import './module/showText.js'
 import './module/stash.js'
 import './module/valueCodeEditor.js'
-BASE_INFO.version = "0.9.15";
+BASE_INFO.version = "0.9.16";
 loadFeature("main", { switch: false }, function () {
   $("body").trigger("featureLoaded");
   console.log("trigger featureLoaded  v:", BASE_INFO);

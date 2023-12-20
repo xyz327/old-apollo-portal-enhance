@@ -85,7 +85,6 @@ function buildGotoNamespace() {
   // 修改选项时 滚动页面到对应位置
   $select.on("select2:select", function (e) {
     var namespaceId = $select.val();
-    console.log("select2:select", e, namespaceId);
     var namespaceEl = $(".namespace-name")
       .toArray()
       .find((el) => el.innerHTML == namespaceId);
