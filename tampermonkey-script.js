@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         apollo-enhance
 // @namespace    apollo-enhance
-// @version      0.9.14
+// @version      0.9.15
 // @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
@@ -527,6 +527,10 @@
    }); 
   %>`);
   function buildGotoNamespace() {
+    var $select = $("#namespaceSelecter");
+    if ($select.length > 0) {
+      return;
+    }
     var namespaceScope = $(
       'div[ng-controller="ConfigNamespaceController"]'
     ).scope();
@@ -536,7 +540,7 @@
   <select id="namespaceSelecter">${optionsTpl}</select>
   </li>
   `);
-    var $select = $("#namespaceSelecter");
+    $select = $("#namespaceSelecter");
     $select.on("select2:open", function (e) {
       $("#select2-namespaceSelecter-results").css({ "max-height": "600px" });
     });
@@ -549,8 +553,8 @@
       var namespaceEl = $(".namespace-name")
         .toArray()
         .find((el) => el.innerHTML == namespaceId);
-        scrollTo(namespaceEl);
-  //      htmlScroll && htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
+      scrollTo(namespaceEl);
+      //      htmlScroll && htmlScroll.doScrollTop($(namespaceEl).offset().top - 100, 1000);
     });
 
     // 滚动页面时同步改变 当前选择的 namespace 选项
@@ -1415,7 +1419,7 @@
 
   });
 
-  BASE_INFO.version = "0.9.14";
+  BASE_INFO.version = "0.9.15";
   loadFeature("main", { switch: false }, function () {
     $("body").trigger("featureLoaded");
     console.log("trigger featureLoaded  v:", BASE_INFO);

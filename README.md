@@ -49,6 +49,17 @@ Apollo 1.2.0 移除了 nice-scroll [PR](https://github.com/apolloconfig/apollo/p
 ![change-diff-1](doc/change-diff-1.png)
 ![change-diff-2](doc/change-diff-2.png)
 
+## 开发说明
+> 依赖 nodejs 环境
+1. 安装[nodejs](https://nodejs.org/en)
+2. git clone 项目
+3. 项目根目录下执行`pnpm i` 
+
+### 发布
+1. `npm run build`
+2. git commit && git push
+3. 合并到master分支
+
 
 
 
