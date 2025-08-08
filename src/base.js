@@ -76,7 +76,6 @@ export function loadCss(href) {
 
   loadCss("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css");
   loadJs("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js");
-  loadJs("https://cdn.bootcdn.net/ajax/libs/diff_match_patch/20121119/diff_match_patch.js");
   const highlight_xcode_css = GM_getResourceText("highlight_xcode_css");
   const text_different_css = GM_getResourceText("text_different_css");
   GM_addStyle(highlight_xcode_css);
