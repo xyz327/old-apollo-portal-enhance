@@ -1,14 +1,14 @@
 // ==UserScript==
-// @name         {{name}}
+// @name         apollo-enhance-v2
 // @namespace    apollo-enhance
-// @version      {{version}}
-// @description  {{description}}
+// @version      0.9.16
+// @description  make old apollo better
 // @homepage     https://github.com/xyz327/old-apollo-portal-enhance
 // @website      https://github.com/xyz327/old-apollo-portal-enhance
 // @source       https://github.com/xyz327/old-apollo-portal-enhance
-// @downloadURL  https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/{{destFile}}
-// @updateURL    https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/{{destFile}}
-// @author       {{author}}
+// @downloadURL  https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/dist/bundle.js
+// @updateURL    https://raw.githubusercontent.com/xyz327/old-apollo-portal-enhance/main/dist/bundle.js
+// @author       xizhou
 // @match        *://*/config.html*
 // @resource     highlight_xcode_css https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/9.18.5/styles/xcode.min.css
 // @require      https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/diff_match_patch/20121119/diff_match_patch_uncompressed.js
@@ -21,3 +21,9 @@
 // @grant      GM_addStyle
 // @grant      GM_addElement
 // ==/UserScript==
+
+(function (_$1) {
+  'use strict';
+  // 本脚本已废弃
+  // 请使用： https://greasyfork.org/zh-CN/scripts/447045-apollo-enhance
+})(_);
