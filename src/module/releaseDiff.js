@@ -1,8 +1,9 @@
 import { loadFeature,showDiffModal } from "../base";
 
-var DiffMatch = new diff_match_patch();
+var DiffMatch;
 
 loadFeature("releaseDiff", false, function () {
+  DiffMatch = new diff_match_patch();
   var releaseModalNode = document.querySelector("#releaseModal");
   if (releaseModalNode == null) {
     return false;

@@ -5,8 +5,8 @@ import { DateType } from "../datatype";
 const cm_modules = {
     core: {
         name: 'core',
-        js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/codemirror.min.js",
-        css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/codemirror.min.css"
+        js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js",
+        css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css"
     },
     mode: {
         json: {
@@ -15,7 +15,7 @@ const cm_modules = {
             addons: ['json-lint']
         },
         javascript: {
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js",
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js",
             mode: "application/javascript",
             addons: ['matchbrackets']
         }
@@ -23,60 +23,60 @@ const cm_modules = {
     addon: {
         dialog: {
             preload: true,
-            css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.css",
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.js"
+            css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.css",
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.js"
         },
         panel: {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/display/panel.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/display/panel.min.js"
         },
-        matchbrackets: { preload: true, js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js" },
-        foldcode: { js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js" },
+        matchbrackets: { preload: true, js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js" },
+        foldcode: { js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js" },
         foldgutter: {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js",
-            css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js",
+            css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css"
         },
         "indent-fold": {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/indent-fold.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/indent-fold.min.js"
         },
         "json-lint": {
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/lint/json-lint.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/json-lint.min.js"
         },
         "active-line": {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"
         },
         "annotatescrollbar": {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/scroll/annotatescrollbar.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/annotatescrollbar.min.js"
         },
         "search": {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/search.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/search.js"
         },
         "searchcursor": {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/searchcursor.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/searchcursor.min.js"
         },
         "matchesonscrollbar": {
             preload: true,
-            css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.css",
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.js"
+            css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.css",
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.js"
         },
         "match-highlighter": {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/match-highlighter.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/match-highlighter.min.js"
         },
         "jump-to-line": {
             preload: true,
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/jump-to-line.min.js"
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/jump-to-line.min.js"
         },
         "simplescrollbars": {
             preload: true,
-            css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.css",
-            js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"
+            css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.css",
+            js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"
         }
     }
 };

@@ -9,24 +9,27 @@ export const BASE_INFO = {}
 export function appendNavBar(child) {
   $(`#${enhanceNavId}`).append(child);
 }
-loadFeature("nav", false, function () {
-  var $navBar = $("#bs-example-navbar-collapse-1");
-  $navBar.append(`
-        <ul id="${enhanceNavId}" class="nav navbar-nav navbar-right">
-          
-        </ul>
-        `);
-  return true;
-});
+
 const loadedJs = {}
 const srcMapping = {
   "bootstrap-switch": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js",
   "bootstrap-switch.css": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
 };
+const deps = [
+"https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
+"https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
+"https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js"
+]
 export function require(deps) {
   deps = _.isArray(deps) ? deps : [deps]
   return Promise.all(deps.map(dep => loadJs(dep)))
 }
+const requiredDeps = new Promise(function (resolve, reject) { 
+  $(function () { 
+    // dom ready
+    require(deps).then(resolve).catch(reject);
+  })
+});
 export function loadJs(src) {
   src = srcMapping[src] || src;
   if (_.endsWith(src, '.css')) {
@@ -42,9 +45,11 @@ export function loadJs(src) {
     });
     if (gmAdd) {
       gmAdd.onload = function () {
+        console.log("loadJs:", src, gmAdd);
         resolve()
       }
     } else {
+      console.log("loadJs:", src);
       resolve()
     }
   })
@@ -71,19 +76,27 @@ export function loadCss(href) {
       }, 2000);
     });
   });
-  // 加载 layer  因为依赖 $ 所以在代码里面进行加载
-  loadJs("https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js");
 
-  loadCss("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css");
-  loadJs("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js");
-  loadJs("https://cdn.bootcdn.net/ajax/libs/diff_match_patch/20121119/diff_match_patch.js");
+  // 加载 layer  因为依赖 $ 所以在代码里面进行加载
+  // loadJs("https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js");
+
+  // loadCss("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css");
+  // loadJs("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js");
   const highlight_xcode_css = GM_getResourceText("highlight_xcode_css");
   const text_different_css = GM_getResourceText("text_different_css");
   GM_addStyle(highlight_xcode_css);
   GM_addStyle(text_different_css);
 
 })();
-
+loadFeature("nav", false, function () {
+  var $navBar = $("#bs-example-navbar-collapse-1");
+  $navBar.append(`
+        <ul id="${enhanceNavId}" class="nav navbar-nav navbar-right">
+          
+        </ul>
+        `);
+  return true;
+});
 export function getAllFeaturenMap() {
   return allFeatureMap;
 }
@@ -225,13 +238,19 @@ function loadFeature0(name, feature, isReloadByHash) {
       console.log(`loadFeature: ${name} has loaded`);
       return;
     }
-    var clear = setInterval(function () {
+    requiredDeps.then(()=>{
+var clear = setInterval(function () {
       if (feature(isReloadByHash) !== false) {
         console.log(`loadFeature: ${name} finished`);
         $(`${"#" + featureId}`).append(`<div id="feature-${name}"></div>`);
         clearInterval(clear);
       }
     }, 1000);
+    }).catch(e=>{
+      console.error(`load feature failed :${name}`, e.message);
+      alert(`load feature failed :${name}`, e.message)
+    });
+    
   } catch (e) {
     console.error(`load feature failed :${name}`, e.message);
   }

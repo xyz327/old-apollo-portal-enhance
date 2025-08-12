@@ -33,7 +33,7 @@
     "name": "stash",
     "more": true,
     "desc": "",
-    "defaultEnabled": false,
+    "defaultEnabled": true,
     "enabledWarn": "实验性功能,请谨慎操作"
   },
   {
@@ -45,12 +45,12 @@
     "name": "prodWarnDisable",
     "desc": "谨慎使用",
     "more": true,
-    "defaultEnabled": false,
+    "defaultEnabled": true,
     "enabledWarn": "实验性功能,请谨慎操作"
   },
   {
     "name": "valueCodeEditor",
     "desc": "配置值编辑器增强",
-    "defaultEnabled": false
+    "defaultEnabled": true
   }
 ]

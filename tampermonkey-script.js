@@ -11,7 +11,9 @@
 // @author       xizhou
 // @match        *://*/config.html*
 // @resource     highlight_xcode_css https://cdn.jsdelivr.net/npm/highlight.js@9.18.5/styles/xcode.min.css
-// @require      https://cdn.jsdelivr.net/combine/npm/highlight.js@9.18.5,npm/highlight.js@9.18.5/lib/languages/json.min.js
+// @require      https://cdn.jsdelivr.net/npm/highlight.js@9.18.5/lib/highlight.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js
+// @require.     https://cdn.jsdelivr.net/npm/highlight.js@9.18.5/lib/languages/json.min.js
 // @resource     text_different_css https://cdn.jsdelivr.net/npm/text-different@1.2.1/build/style/text-different.min.css
 // @require      https://cdn.jsdelivr.net/combine/npm/text-different@1.2.1/build/text-different.min.js,npm/text-different@1.2.1/build/text-different-for-html.min.js
 // @noframes
@@ -58,7 +60,7 @@
   		name: "stash",
   		more: true,
   		desc: "",
-  		defaultEnabled: false,
+  		defaultEnabled: true,
   		enabledWarn: "实验性功能,请谨慎操作"
   	},
   	{
@@ -70,13 +72,13 @@
   		name: "prodWarnDisable",
   		desc: "谨慎使用",
   		more: true,
-  		defaultEnabled: false,
+  		defaultEnabled: true,
   		enabledWarn: "实验性功能,请谨慎操作"
   	},
   	{
   		name: "valueCodeEditor",
   		desc: "配置值编辑器增强",
-  		defaultEnabled: false
+  		defaultEnabled: true
   	}
   ];
 
@@ -90,24 +92,27 @@
   function appendNavBar(child) {
     $(`#${enhanceNavId}`).append(child);
   }
-  loadFeature("nav", false, function () {
-    var $navBar = $("#bs-example-navbar-collapse-1");
-    $navBar.append(`
-        <ul id="${enhanceNavId}" class="nav navbar-nav navbar-right">
-          
-        </ul>
-        `);
-    return true;
-  });
+
   const loadedJs = {};
   const srcMapping = {
     "bootstrap-switch": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js",
     "bootstrap-switch.css": "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
   };
+  const deps = [
+  "https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js",
+  "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css",
+  "https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js"
+  ];
   function require(deps) {
     deps = _.isArray(deps) ? deps : [deps];
     return Promise.all(deps.map(dep => loadJs(dep)))
   }
+  const requiredDeps = new Promise(function (resolve, reject) { 
+    $(function () { 
+      // dom ready
+      require(deps).then(resolve).catch(reject);
+    });
+  });
   function loadJs(src) {
     src = srcMapping[src] || src;
     if (_.endsWith(src, '.css')) {
@@ -123,9 +128,11 @@
       });
       if (gmAdd) {
         gmAdd.onload = function () {
+          console.log("loadJs:", src, gmAdd);
           resolve();
         };
       } else {
+        console.log("loadJs:", src);
         resolve();
       }
     });
@@ -152,19 +159,27 @@
         }, 2000);
       });
     });
-    // 加载 layer  因为依赖 $ 所以在代码里面进行加载
-    loadJs("https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js");
 
-    loadCss("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css");
-    loadJs("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js");
-    loadJs("https://cdn.bootcdn.net/ajax/libs/diff_match_patch/20121119/diff_match_patch.js");
+    // 加载 layer  因为依赖 $ 所以在代码里面进行加载
+    // loadJs("https://cdn.jsdelivr.net/npm/layer-src@3.5.1/src/layer.js");
+
+    // loadCss("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css");
+    // loadJs("https://cdn.jsdelivr.net/npm/bootstrap-switch@3.3.4/dist/js/bootstrap-switch.min.js");
     const highlight_xcode_css = GM_getResourceText("highlight_xcode_css");
     const text_different_css = GM_getResourceText("text_different_css");
     GM_addStyle(highlight_xcode_css);
     GM_addStyle(text_different_css);
 
   })();
-
+  loadFeature("nav", false, function () {
+    var $navBar = $("#bs-example-navbar-collapse-1");
+    $navBar.append(`
+        <ul id="${enhanceNavId}" class="nav navbar-nav navbar-right">
+          
+        </ul>
+        `);
+    return true;
+  });
   function getAllFeaturenMap() {
     return allFeatureMap;
   }
@@ -306,13 +321,19 @@
         console.log(`loadFeature: ${name} has loaded`);
         return;
       }
-      var clear = setInterval(function () {
+      requiredDeps.then(()=>{
+  var clear = setInterval(function () {
         if (feature(isReloadByHash) !== false) {
           console.log(`loadFeature: ${name} finished`);
           $(`${"#" + featureId}`).append(`<div id="feature-${name}"></div>`);
           clearInterval(clear);
         }
       }, 1000);
+      }).catch(e=>{
+        console.error(`load feature failed :${name}`, e.message);
+        alert(`load feature failed :${name}`, e.message);
+      });
+      
     } catch (e) {
       console.error(`load feature failed :${name}`, e.message);
     }
@@ -617,9 +638,10 @@
     return  env && env === "PRO";
   }
 
-  var DiffMatch = new diff_match_patch();
+  var DiffMatch;
 
   loadFeature("releaseDiff", false, function () {
+    DiffMatch = new diff_match_patch();
     var releaseModalNode = document.querySelector("#releaseModal");
     if (releaseModalNode == null) {
       return false;
@@ -1193,8 +1215,8 @@
   const cm_modules = {
       core: {
           name: 'core',
-          js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/codemirror.min.js",
-          css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/codemirror.min.css"
+          js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js",
+          css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css"
       },
       mode: {
           json: {
@@ -1203,7 +1225,7 @@
               addons: ['json-lint']
           },
           javascript: {
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js",
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js",
               mode: "application/javascript",
               addons: ['matchbrackets']
           }
@@ -1211,60 +1233,60 @@
       addon: {
           dialog: {
               preload: true,
-              css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.css",
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.js"
+              css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.css",
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.js"
           },
           panel: {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/display/panel.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/display/panel.min.js"
           },
-          matchbrackets: { preload: true, js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js" },
-          foldcode: { js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js" },
+          matchbrackets: { preload: true, js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js" },
+          foldcode: { js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js" },
           foldgutter: {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js",
-              css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js",
+              css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css"
           },
           "indent-fold": {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/fold/indent-fold.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/indent-fold.min.js"
           },
           "json-lint": {
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/lint/json-lint.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/json-lint.min.js"
           },
           "active-line": {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"
           },
           "annotatescrollbar": {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/scroll/annotatescrollbar.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/annotatescrollbar.min.js"
           },
           "search": {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/search.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/search.js"
           },
           "searchcursor": {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/searchcursor.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/searchcursor.min.js"
           },
           "matchesonscrollbar": {
               preload: true,
-              css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.css",
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.js"
+              css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.css",
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.js"
           },
           "match-highlighter": {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/match-highlighter.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/match-highlighter.min.js"
           },
           "jump-to-line": {
               preload: true,
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/search/jump-to-line.min.js"
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/jump-to-line.min.js"
           },
           "simplescrollbars": {
               preload: true,
-              css: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.css",
-              js: "https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"
+              css: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.css",
+              js: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"
           }
       }
   };
